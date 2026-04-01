@@ -1,29 +1,19 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import { products } from '../data/products';
 import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 
-// Lazy initialize Gemini API
-let aiInstance: GoogleGenAI | null = null;
-const getAI = () => {
-  if (!aiInstance) {
-    aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
-  }
-  return aiInstance;
-};
-
 interface Message {
-  role: 'user' | 'model';
+  role: 'user' | 'assistant';
   text: string;
 }
 
 export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', text: 'Halo! Saya Gracia Asisten. Ada yang bisa saya bantu terkait menu atau pesanan?' }
+    { role: 'assistant', text: 'Halo! Saya Gracia Asisten. Ada yang bisa saya bantu terkait menu atau pesanan?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -78,25 +68,43 @@ export function AIChat() {
       Jika mereka bertanya tentang pesanan sebelumnya, arahkan ke menu "Riwayat Pesanan" di pojok kanan atas.
       Format jawaban menggunakan Markdown jika perlu (seperti bold untuk nama produk).`;
 
-      const contents = messages.map(m => ({
+      const chatHistory = messages.map(m => ({
         role: m.role,
-        parts: [{ text: m.text }]
+        content: m.text
       }));
-      contents.push({ role: 'user', parts: [{ text: userText }] });
+      chatHistory.push({ role: 'user', content: userText });
 
-      const response = await getAI().models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: contents,
-        config: {
-          systemInstruction,
-          temperature: 0.7,
-        }
+      // Pollinations API call (using OpenAI-compatible format)
+      const response = await fetch('https://text.pollinations.ai/openai/chat/completions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          // Add authorization if key is provided
+          ...(process.env.POLLINATIONS_API_KEY ? { 'Authorization': `Bearer ${process.env.POLLINATIONS_API_KEY}` } : {})
+        },
+        body: JSON.stringify({
+          messages: [
+            { role: 'system', content: systemInstruction },
+            ...chatHistory
+          ],
+          model: 'deepseek', // User requested deepseek mode
+          seed: 42,
+          temperature: 0.7
+        })
       });
 
-      setMessages(prev => [...prev, { role: 'model', text: response.text || 'Maaf, saya tidak mengerti.' }]);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('Pollinations API error:', errorData);
+        throw new Error(`Pollinations API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const responseText = data.choices?.[0]?.message?.content || 'Maaf, saya tidak mengerti.';
+      setMessages(prev => [...prev, { role: 'assistant', text: responseText }]);
     } catch (error) {
       console.error('AI Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'model', text: 'Maaf, sedang terjadi gangguan pada sistem kami. Silakan coba lagi nanti atau hubungi WhatsApp kami.' }]);
+      setMessages(prev => [...prev, { role: 'assistant', text: 'Maaf, sedang terjadi gangguan pada sistem kami. Silakan coba lagi nanti atau hubungi WhatsApp kami.' }]);
     } finally {
       setIsLoading(false);
     }
@@ -142,7 +150,7 @@ export function AIChat() {
                       ? 'bg-primary text-white rounded-tr-sm' 
                       : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-tl-sm shadow-sm'
                   }`}>
-                    {msg.role === 'model' ? (
+                    {msg.role === 'assistant' ? (
                       <div className="prose prose-sm prose-stone dark:prose-invert max-w-none">
                         <ReactMarkdown>{msg.text}</ReactMarkdown>
                       </div>
