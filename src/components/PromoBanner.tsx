@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
+import { APP_CONFIG } from '../data/config';
 
 export function PromoBanner() {
   const [isVisible, setIsVisible] = useState(false);
@@ -28,7 +29,7 @@ export function PromoBanner() {
   return (
     <div className="bg-primary dark:bg-primary-dark text-white px-4 py-2 flex justify-between items-center text-sm z-50 relative">
       <div className="flex-1 text-center font-medium">
-        🎉 Promo Spesial! Diskon 10% untuk pemesanan pertama via WhatsApp.
+        {APP_CONFIG.activePromo.bannerText}
       </div>
       <button 
         onClick={handleClose} 

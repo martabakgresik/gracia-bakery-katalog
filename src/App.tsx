@@ -15,12 +15,13 @@ import { CookieBanner } from './components/CookieBanner';
 import { About } from './components/About';
 import { FAQ } from './components/FAQ';
 import { products } from './data/products';
+import { APP_CONFIG } from './data/config';
 import { Product, CartItem, Order, ProductVariant, PromoCode } from './types';
 
 const CATEGORIES = ['Semua', 'Roti', 'Jajanan Pasar', 'Kue Kering', 'Donat'];
 
 const PROMO_CODES: PromoCode[] = [
-  { code: 'graciadiskon', discountPercent: 10, description: 'Diskon 10% untuk pemesan pertama' }
+  APP_CONFIG.activePromo
 ];
 
 export default function App() {

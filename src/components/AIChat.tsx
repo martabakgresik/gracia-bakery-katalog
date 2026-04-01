@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { X, Send, Loader2, Maximize2, Minimize2, Phone, MessageSquare, Store, Trash2 } from 'lucide-react';
 import { products } from '../data/products';
+import { APP_CONFIG } from '../data/config';
 import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
@@ -72,7 +73,7 @@ export function AIChat() {
 
     try {
       const productContext = products.map(p => `- ${p.name} (${p.category}): Rp${p.price.toLocaleString('id-ID')}. ${p.description}`).join('\n');
-      
+
       const systemInstruction = `Anda adalah "Gracia Asisten", asisten virtual resmi untuk website Gracia Bakery.
       Toko ini menjual roti, jajanan pasar, kue kering, dan donat.
       Nomor WhatsApp toko: +62 822-3330-9744.
@@ -85,6 +86,11 @@ export function AIChat() {
       Daftar produk kami:
       ${productContext}
       
+      Informasi Promo Aktif:
+      Saat ini ada promo: "${APP_CONFIG.activePromo.bannerText}". 
+      Kode promo yang bisa digunakan adalah "**${APP_CONFIG.activePromo.code}**" untuk mendapatkan diskon sebesar **${APP_CONFIG.activePromo.discountPercent}%**. 
+      Harap beritahukan info promo ini kepada pelanggan jika mereka bertanya tentang diskon, harga murah, atau cara menghemat belanja.
+
       Tugas Anda:
       1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
       2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya agar percakapan terasa natural.
@@ -121,7 +127,7 @@ export function AIChat() {
 
       const data = await response.json();
       const responseText = data.choices?.[0]?.message?.content;
-      
+
       if (!responseText) throw new Error('Empty response');
 
       setMessages(prev => [...prev, { role: 'assistant', text: responseText }]);
@@ -153,9 +159,9 @@ export function AIChat() {
         {isOpen && (
           <motion.div
             initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ 
-              opacity: 1, 
-              y: 0, 
+            animate={{
+              opacity: 1,
+              y: 0,
               scale: 1,
               width: isMaximized ? 'min(1000px, calc(100vw - 2rem))' : 'min(350px, calc(100vw - 2rem))',
               height: isMaximized ? 'min(800px, calc(100vh - 4rem))' : 'min(500px, calc(100vh - 4rem))',
@@ -189,15 +195,15 @@ export function AIChat() {
                 </div>
               </div>
               <div className="flex items-center gap-2 ml-2 shrink-0">
-                <button 
-                  onClick={handleClearChat} 
+                <button
+                  onClick={handleClearChat}
                   className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
                   title="Hapus Percakapan"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
-                <button 
-                  onClick={() => setIsMaximized(!isMaximized)} 
+                <button
+                  onClick={() => setIsMaximized(!isMaximized)}
                   className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
                   title={isMaximized ? "Kecilkan" : "Besarkan"}
                 >
@@ -213,11 +219,10 @@ export function AIChat() {
             <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-stone-50 dark:bg-stone-900/50">
               {messages.map((msg, idx) => (
                 <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${
-                    msg.role === 'user' 
-                      ? 'bg-primary text-white rounded-tr-sm' 
+                  <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${msg.role === 'user'
+                      ? 'bg-primary text-white rounded-tr-sm'
                       : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-tl-sm shadow-sm'
-                  }`}>
+                    }`}>
                     {msg.role === 'assistant' ? (
                       <div className="prose prose-sm prose-stone dark:prose-invert max-w-none">
                         <ReactMarkdown
@@ -225,7 +230,7 @@ export function AIChat() {
                             a: ({ node, ...props }) => {
                               const isWhatsApp = props.href?.includes('wa.me');
                               const isTel = props.href?.startsWith('tel:');
-                              
+
                               if (isWhatsApp) {
                                 return (
                                   <a
@@ -239,7 +244,7 @@ export function AIChat() {
                                   </a>
                                 );
                               }
-                              
+
                               if (isTel) {
                                 return (
                                   <a
@@ -248,10 +253,10 @@ export function AIChat() {
                                   >
                                     <Phone className="w-4 h-4" />
                                     Hubungi Telepon
-                                    </a>
+                                  </a>
                                 );
                               }
-                              
+
                               return <a {...props} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" />;
                             }
                           }}
