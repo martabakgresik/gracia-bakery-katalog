@@ -32,16 +32,16 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center justify-center flex-1 sm:flex-none sm:justify-start">
-            <h1 className="font-serif text-3xl font-bold text-primary tracking-tight">
+            <h1 className="font-serif text-3xl font-bold text-primary-dark dark:text-primary-light tracking-tight">
               Gracia Bakery
             </h1>
           </div>
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex ml-8 space-x-6 items-center">
-            <a href="#menu" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Menu</a>
-            <a href="#about" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Tentang Kami</a>
-            <a href="#faq" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">FAQ</a>
+            <a href="#menu" className="text-stone-700 dark:text-stone-300 hover:text-primary-light dark:hover:text-primary-light font-medium transition-colors">Menu</a>
+            <a href="#about" className="text-stone-700 dark:text-stone-300 hover:text-primary-light dark:hover:text-primary-light font-medium transition-colors">Tentang Kami</a>
+            <a href="#faq" className="text-stone-700 dark:text-stone-300 hover:text-primary-light dark:hover:text-primary-light font-medium transition-colors">FAQ</a>
           </nav>
 
           {/* Desktop Search */}
@@ -73,7 +73,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
 
             <button 
               onClick={onOpenWishlist}
-              className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
+              className="relative p-2 text-stone-700 hover:text-primary-light dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Wishlist"
             >
               <Heart className="h-6 w-6" />
@@ -86,7 +86,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
 
             <button 
               onClick={onOpenHistory}
-              className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
+              className="relative p-2 text-stone-700 hover:text-primary-light dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Riwayat Pesanan"
             >
               <History className="h-6 w-6" />
@@ -94,7 +94,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
 
             <button 
               onClick={onOpenCart}
-              className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
+              className="relative p-2 text-stone-700 hover:text-primary-light dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Keranjang Belanja"
             >
               <ShoppingBag className="h-6 w-6" />
@@ -129,21 +129,21 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
             <a 
               href="#menu" 
               onClick={() => setIsMobileMenuOpen(false)} 
-              className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              className="block px-2 text-stone-700 dark:text-stone-300 font-medium hover:text-primary-light dark:hover:text-primary-light transition-colors"
             >
               Menu Spesial
             </a>
             <a 
               href="#about" 
               onClick={() => setIsMobileMenuOpen(false)} 
-              className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              className="block px-2 text-stone-700 dark:text-stone-300 font-medium hover:text-primary-light dark:hover:text-primary-light transition-colors"
             >
               Tentang Kami
             </a>
             <a 
               href="#faq" 
               onClick={() => setIsMobileMenuOpen(false)} 
-              className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              className="block px-2 text-stone-700 dark:text-stone-300 font-medium hover:text-primary-light dark:hover:text-primary-light transition-colors"
             >
               FAQ
             </a>
@@ -152,17 +152,17 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
                 setIsMobileMenuOpen(false);
                 onOpenHistory();
               }} 
-              className="flex items-center px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors w-full text-left"
+              className="flex items-center px-2 text-stone-700 dark:text-stone-300 font-medium hover:text-primary-light dark:hover:text-primary-light transition-colors w-full text-left"
             >
               <History className="h-4 w-4 mr-2" />
               Riwayat Pesanan
             </button>
-            <div className="flex items-center px-2 text-stone-600 dark:text-stone-300">
+            <div className="flex items-center px-2 text-stone-700 dark:text-stone-300">
               <Phone className="h-4 w-4 mr-2" />
               <span className="text-sm font-medium">+62 822-3330-9744</span>
             </div>
             <div className="flex items-center justify-between px-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-              <span className="text-stone-600 dark:text-stone-300 font-medium">Tema Tampilan</span>
+              <span className="text-stone-700 dark:text-stone-300 font-medium">Tema Tampilan</span>
               <ThemeToggle />
             </div>
           </div>

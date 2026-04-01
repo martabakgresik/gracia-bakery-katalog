@@ -17,13 +17,13 @@ export function PromoBanner() {
   };
 
   return (
-    <div className="bg-primary dark:bg-primary-dark text-white px-4 py-2 flex justify-between items-center text-sm z-50 relative">
-      <div className="flex-1 text-center font-medium">
+    <div className="bg-primary dark:bg-primary-dark text-white px-4 py-3 flex justify-between items-center text-sm z-50 relative shadow-sm">
+      <div className="flex-1 text-center font-semibold">
         🎉 Promo Spesial! Diskon 10% untuk pemesanan pertama via WhatsApp.
       </div>
       <button 
         onClick={handleClose} 
-        className="p-1 hover:bg-white/20 rounded-full transition-colors shrink-0 ml-4"
+        className="p-1 hover:bg-white/30 rounded-full transition-colors shrink-0 ml-4"
         aria-label="Tutup promo"
       >
         <X className="w-4 h-4" />

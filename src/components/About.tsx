@@ -16,14 +16,14 @@ export function About() {
             <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 mb-6">
               Tentang Gracia Bakery
             </h2>
-            <div className="w-20 h-1 bg-primary rounded-full opacity-80 mb-6"></div>
+            <div className="w-20 h-1 bg-primary dark:bg-primary-light rounded-full mb-6"></div>
             <p className="text-stone-600 dark:text-stone-300 leading-relaxed mb-4">
               Berdiri sejak tahun 2010, Gracia Bakery bermula dari kecintaan kami terhadap resep kue tradisional warisan keluarga. Kami percaya bahwa setiap gigitan roti dan kue harus membawa kehangatan dan kebahagiaan.
             </p>
             <p className="text-stone-600 dark:text-stone-300 leading-relaxed mb-4">
               Kami berkomitmen untuk selalu menggunakan bahan-bahan premium berkualitas tinggi, tanpa bahan pengawet buatan. Mulai dari jajanan pasar yang autentik hingga kue kering modern, semuanya dibuat fresh setiap hari oleh tangan-tangan pembuat roti kami yang berpengalaman.
             </p>
-            <p className="text-stone-600 dark:text-stone-300 leading-relaxed font-medium">
+            <p className="text-stone-700 dark:text-stone-200 leading-relaxed font-semibold">
               Terima kasih telah menjadikan Gracia Bakery bagian dari momen spesial Anda.
             </p>
           </div>

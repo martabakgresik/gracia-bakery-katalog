@@ -186,7 +186,7 @@ export default function App() {
               <h2 className="text-3xl md:text-4xl font-serif font-bold text-stone-900 dark:text-stone-100 mb-4">
                 Menu Spesial Kami
               </h2>
-              <div className="w-24 h-1 bg-primary mx-auto rounded-full opacity-80"></div>
+              <div className="w-24 h-1 bg-primary dark:bg-primary-light mx-auto rounded-full"></div>
               <p className="mt-6 text-stone-600 dark:text-stone-400 max-w-2xl mx-auto">
                 Pilih aneka jajanan dan kue kering favorit Anda. Dibuat fresh setiap hari dengan bahan berkualitas tinggi.
               </p>
@@ -198,10 +198,10 @@ export default function App() {
                 <button
                   key={category}
                   onClick={() => setSelectedCategory(category)}
-                  className={`px-6 py-2.5 rounded-full text-sm font-medium transition-all duration-200 ${
+                  className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
                     selectedCategory === category
                       ? 'bg-primary text-white shadow-md'
-                      : 'bg-white dark:bg-stone-800 text-stone-600 dark:text-stone-300 border border-stone-200 dark:border-stone-700 hover:border-primary dark:hover:border-primary-light hover:text-primary dark:hover:text-primary-light'
+                      : 'bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-2 border-stone-300 dark:border-stone-700 hover:border-primary dark:hover:border-primary-light hover:text-primary dark:hover:text-primary-light'
                   }`}
                 >
                   {category}

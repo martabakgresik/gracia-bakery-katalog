@@ -82,20 +82,20 @@ export function ProductCard({ product, onAddToCart, onClick, isWishlisted, onTog
         </div>
         
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-stone-100 dark:border-stone-700">
-          <span className="text-lg font-semibold text-primary dark:text-primary-light">
+          <span className="text-lg font-bold text-primary dark:text-primary-light">
             {formatPrice(product.price)}
           </span>
           <div className="flex items-center gap-2">
             <button
               onClick={handleShareClick}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-stone-50 dark:bg-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-200 dark:hover:bg-stone-600 transition-colors duration-200"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-stone-200 dark:bg-stone-700 text-stone-700 dark:text-stone-200 hover:bg-primary dark:hover:bg-primary hover:text-white transition-colors duration-200"
               aria-label={`Bagikan ${product.name}`}
             >
               <Share2 className="w-4 h-4" />
             </button>
             <button
               onClick={handleAddToCart}
-              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-stone-100 dark:bg-stone-700 text-stone-700 dark:text-stone-200 hover:bg-primary dark:hover:bg-primary hover:text-white transition-colors duration-200"
+              className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary dark:bg-primary hover:bg-primary-light dark:hover:bg-primary-light text-white transition-colors duration-200 font-bold shadow-sm"
               aria-label={`Tambah ${product.name} ke keranjang`}
             >
               <Plus className="w-5 h-5" />

@@ -21,7 +21,7 @@ export function Hero() {
         <div className="mt-10 flex justify-center gap-4">
           <a
             href="#menu"
-            className="inline-flex items-center px-8 py-3 border border-transparent text-base font-medium rounded-full text-white bg-primary hover:bg-primary-light transition-colors duration-200"
+            className="inline-flex items-center px-8 py-3 border-2 border-transparent text-base font-bold rounded-full text-white bg-primary hover:bg-primary-light transition-colors duration-200 shadow-lg"
           >
             Lihat Menu
           </a>
