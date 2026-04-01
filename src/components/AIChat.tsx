@@ -1,13 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { MessageCircle, X, Send, Loader2, Bot } from 'lucide-react';
-import { GoogleGenAI } from '@google/genai';
 import { products } from '../data/products';
 import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
-
-// Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 interface Message {
   role: 'user' | 'model';
@@ -72,24 +68,44 @@ export function AIChat() {
       Jika mereka bertanya tentang pesanan sebelumnya, arahkan ke menu "Riwayat Pesanan" di pojok kanan atas.
       Format jawaban menggunakan Markdown jika perlu (seperti bold untuk nama produk).`;
 
-      const contents = messages.map(m => ({
+      const conversationHistory = messages.map(m => ({
         role: m.role,
-        parts: [{ text: m.text }]
+        content: m.text
       }));
-      contents.push({ role: 'user', parts: [{ text: userText }] });
+      conversationHistory.push({ role: 'user', content: userText });
 
-      const response = await ai.models.generateContent({
-        model: 'gemini-3-flash-preview',
-        contents: contents,
-        config: {
-          systemInstruction,
+      const apiKey = import.meta.env.VITE_POLLINATIONS_API_KEY;
+      if (!apiKey) {
+        throw new Error('API key not configured');
+      }
+
+      const response = await fetch('https://api.pollinations.ai/openai/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`
+        },
+        body: JSON.stringify({
+          model: 'openai',
+          messages: [
+            { role: 'system', content: systemInstruction },
+            ...conversationHistory
+          ],
           temperature: 0.7,
-        }
+          max_tokens: 500
+        })
       });
 
-      setMessages(prev => [...prev, { role: 'model', text: response.text || 'Maaf, saya tidak mengerti.' }]);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      const aiResponse = data.choices?.[0]?.message?.content || 'Maaf, saya tidak mengerti.';
+
+      setMessages(prev => [...prev, { role: 'model', text: aiResponse }]);
     } catch (error) {
-      console.error('AI Chat Error:', error);
+      console.error('[v0] AI Chat Error:', error);
       setMessages(prev => [...prev, { role: 'model', text: 'Maaf, sedang terjadi gangguan pada sistem kami. Silakan coba lagi nanti atau hubungi WhatsApp kami.' }]);
     } finally {
       setIsLoading(false);

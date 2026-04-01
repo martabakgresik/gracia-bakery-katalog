@@ -2,23 +2,20 @@
 
 @layer base {
   :root {
-    --primary: #8B4513;
-    --primary-light: #A0522D;
-    --background: #FDFBF7;
-    --surface: #FFFFFF;
-    --text: #2D241E;
+    color-scheme: light;
   }
 
   .dark {
-    --primary: #A0522D;
-    --background: rgb(12 10 9);
-    --surface: rgb(28 25 23);
-    --text: rgb(245 245 244);
+    color-scheme: dark;
   }
 
   body {
-    @apply bg-[#FDFBF7] dark:bg-stone-900 text-[#2D241E] dark:text-stone-100 transition-colors duration-300;
+    @apply bg-[#FDFBF7] text-[#2D241E] transition-colors duration-300;
     font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+  }
+
+  .dark body {
+    @apply bg-stone-900 text-stone-100;
   }
 
   h1, h2, h3, h4, h5, h6 {
