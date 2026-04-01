@@ -15,7 +15,7 @@ export function Hero({ searchQuery, onSearchChange }: HeroProps) {
       <div className="absolute inset-0">
         <img
           className="w-full h-full object-cover opacity-40"
-          src="https://images.unsplash.com/photo-1517433670267-08bbd4be890f?auto=format&fit=crop&q=80&w=2000"
+          src="./hero-bg.webp"
           alt="Aneka roti dan kue kering"
           referrerPolicy="no-referrer"
         />
@@ -29,7 +29,7 @@ export function Hero({ searchQuery, onSearchChange }: HeroProps) {
           transition={{ duration: 0.6 }}
           className="text-4xl font-serif font-bold tracking-tight text-white sm:text-5xl lg:text-6xl"
         >
-          Cita Rasa Tradisi dalam Setiap Gigitan
+          Kehangatan Premium dari Oven Kami ke Tangan Anda
         </motion.h1>
         <motion.p 
           initial={{ opacity: 0, y: 20 }}
@@ -37,7 +37,7 @@ export function Hero({ searchQuery, onSearchChange }: HeroProps) {
           transition={{ duration: 0.6, delay: 0.2 }}
           className="mt-6 max-w-2xl mx-auto text-xl text-stone-200 font-sans font-light"
         >
-          Menyajikan aneka roti, lemper, donat, coklat cookies, nastar, dan kue kering premium dengan resep warisan keluarga Gracia.
+          Nikmati kelembutan roti sobek, nastar lumer, hingga otentiknya lemper ayam. Dibuat fresh setiap pagi menggunakan bahan premium dan resep rahasia Gracia Bakery.
         </motion.p>
         
         <div className="mt-10 flex flex-col items-center gap-6">

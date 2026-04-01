@@ -202,7 +202,7 @@ export default function App() {
       <div className="min-h-screen bg-stone-50 dark:bg-stone-900 flex flex-col items-center justify-center transition-colors duration-300">
         <Loader2 className="w-12 h-12 text-primary animate-spin mb-4" />
         <h2 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100 mb-2">Gracia Bakery</h2>
-        <p className="text-stone-500 dark:text-stone-400 font-medium animate-pulse">Menyiapkan hidangan segar...</p>
+        <p className="text-stone-500 dark:text-stone-400 font-medium animate-pulse">Mohon Tunggu beberapa detik...</p>
       </div>
     );
   }

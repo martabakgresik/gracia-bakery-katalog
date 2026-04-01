@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Maximize2, Minimize2, Phone, MessageSquare, Store } from 'lucide-react';
+import { X, Send, Loader2, Maximize2, Minimize2, Phone, MessageSquare, Store, Trash2 } from 'lucide-react';
 import { products } from '../data/products';
 import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
@@ -14,13 +14,19 @@ export function AIChat() {
   const [isOpen, setIsOpen] = useState(false);
   const [isMaximized, setIsMaximized] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: 'Halo! Saya Gracia Asisten. Ada yang bisa saya bantu terkait menu atau pesanan?' }
+    { role: 'assistant', text: 'Halo Kak! 😊 Saya Gracia Asisten. Ada roti atau kue favorit yang sedang Kakak cari hari ini?' }
   ]);
   const [input, setInput] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [loadingTime, setLoadingTime] = useState(0);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleClearChat = () => {
+    setMessages([
+      { role: 'assistant', text: 'Halo Kak! 😊 Saya Gracia Asisten. Ada roti atau kue favorit yang sedang Kakak cari hari ini?' }
+    ]);
+  };
 
   const adjustHeight = () => {
     const textarea = textareaRef.current;
@@ -80,8 +86,13 @@ export function AIChat() {
       ${productContext}
       
       Tugas Anda:
-      Jawab pertanyaan pelanggan dengan ramah, sopan, singkat, dan persuasif. Gunakan bahasa Indonesia yang santai tapi profesional. 
-      Format jawaban menggunakan Markdown jika perlu.`;
+      1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
+      2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya agar percakapan terasa natural.
+      3. Jawab pertanyaan dengan singkat, padat, namun persuasif. 
+      4. Selalu lakukan trik "Upselling" dengan halus. Contoh: Jika Kakak memesan/bertanya tentang Roti Sobek, rekomendasikan juga sekalian Nastar Lumer atau minuman pendampingnya untuk melengkapi pesanan. 
+      5. Gunakan bahasa Indonesia yang santai namun tetap sopan dan profesional.
+      6. Wajib gunakan format Markdown tekstual untuk memikat bacaan: gunakan **tebal** (bold) untuk nama produk, harga, atau highlight penting, gunakan *miring* (italic) untuk penekanan rasa/upselling, dan gunakan ~~coret~~ (strikethrough) jika sedang mempromosikan diskon "harga coret".
+      7. Gunakan Markdown URL untuk link WhatsApp (opsional namun sangat disarankan jika pelanggan ingin beli).`;
 
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -171,6 +182,13 @@ export function AIChat() {
                 </div>
               </div>
               <div className="flex items-center gap-2 ml-2 shrink-0">
+                <button 
+                  onClick={handleClearChat} 
+                  className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
+                  title="Hapus Percakapan"
+                >
+                  <Trash2 className="w-4 h-4" />
+                </button>
                 <button 
                   onClick={() => setIsMaximized(!isMaximized)} 
                   className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
