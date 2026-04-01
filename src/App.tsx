@@ -201,7 +201,7 @@ export default function App() {
                   className={`px-6 py-2.5 rounded-full text-sm font-bold transition-all duration-200 ${
                     selectedCategory === category
                       ? 'bg-primary text-white shadow-md'
-                      : 'bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-2 border-stone-300 dark:border-stone-700 hover:border-primary dark:hover:border-primary-light hover:text-primary dark:hover:text-primary-light'
+                      : 'bg-white dark:bg-stone-800 text-stone-700 dark:text-stone-300 border-2 border-stone-300 dark:border-stone-700 hover:border-primary dark:hover:border-#C85A3A hover:text-primary dark:hover:text-primary-light'
                   }`}
                 >
                   {category}

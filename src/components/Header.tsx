@@ -23,7 +23,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
           <div className="flex items-center sm:hidden">
             <button 
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
+              className="p-2 text-stone-600 hover:text-primary-light dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Menu"
             >
               {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
@@ -32,7 +32,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center justify-center flex-1 sm:flex-none sm:justify-start">
-            <h1 className="font-serif text-3xl font-bold text-primary-dark dark:text-primary-light tracking-tight">
+            <h1 className="font-serif text-3xl font-bold text-[#6B3410] dark:text-primary-light tracking-tight">
               Gracia Bakery
             </h1>
           </div>
@@ -55,7 +55,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
                 value={searchQuery}
                 onChange={(e) => onSearchChange(e.target.value)}
                 placeholder="Cari roti, kue..."
-                className="block w-full pl-11 pr-4 py-2.5 border border-stone-200 dark:border-stone-700 rounded-full leading-5 bg-stone-50 dark:bg-stone-800 placeholder-stone-400 dark:placeholder-stone-500 text-stone-900 dark:text-stone-100 focus:outline-none focus:bg-white dark:focus:bg-stone-900 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200"
+              className="block w-full pl-11 pr-4 py-2.5 border border-stone-200 dark:border-stone-700 rounded-full leading-5 bg-stone-50 dark:bg-stone-800 placeholder-stone-400 dark:placeholder-stone-500 text-stone-900 dark:text-stone-100 focus:outline-none focus:bg-white dark:focus:bg-stone-900 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200"
               />
             </div>
           </div>

@@ -54,7 +54,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
               <p className="text-sm text-center">Simpan produk favorit Anda di sini untuk dibeli nanti.</p>
               <button 
                 onClick={onClose}
-                className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
+                className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-#C85A3A transition-colors"
               >
                 Jelajahi Menu
               </button>
@@ -90,7 +90,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
                       <div className="flex items-center gap-3 mt-2">
                         <button 
                           onClick={() => onAddToCart(item)}
-                          className="flex-1 flex items-center justify-center gap-2 bg-stone-100 dark:bg-stone-800 hover:bg-primary dark:hover:bg-primary text-stone-700 dark:text-stone-300 hover:text-white dark:hover:text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"
+                          className="flex-1 flex items-center justify-center gap-2 bg-stone-100 dark:bg-stone-800 hover:bg-primary-light dark:hover:bg-primary-light text-stone-700 dark:text-stone-300 hover:text-white dark:hover:text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"
                         >
                           <ShoppingBag className="w-4 h-4" />
                           Tambah

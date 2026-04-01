@@ -112,7 +112,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
                       <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full mt-2 w-fit border border-stone-200 dark:border-stone-700 shadow-sm">
                         <button 
                           onClick={() => onUpdateQuantity(item.cartItemId, -1)}
-                          className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-l-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
+                          className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary-light dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-l-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
                           aria-label="Kurangi jumlah"
                         >
                           <Minus className="w-4 h-4" />
@@ -120,7 +120,7 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
                         <span className="text-sm font-bold w-8 text-center text-stone-900 dark:text-stone-100 select-none">{item.quantity}</span>
                         <button 
                           onClick={() => onUpdateQuantity(item.cartItemId, 1)}
-                          className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-r-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
+                          className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary-light dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-r-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
                           aria-label="Tambah jumlah"
                         >
                           <Plus className="w-4 h-4" />

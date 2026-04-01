@@ -17,7 +17,7 @@ export function PromoBanner() {
   };
 
   return (
-    <div className="bg-primary dark:bg-primary-dark text-white px-4 py-3 flex justify-between items-center text-sm z-50 relative shadow-sm">
+    <div className="bg-primary dark:bg-[#6B3410] text-white px-4 py-3 flex justify-between items-center text-sm z-50 relative shadow-sm">
       <div className="flex-1 text-center font-semibold">
         🎉 Promo Spesial! Diskon 10% untuk pemesanan pertama via WhatsApp.
       </div>
