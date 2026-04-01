@@ -17,6 +17,7 @@ export default defineConfig(({mode}) => {
     },
     server: {
       hmr: process.env.DISABLE_HMR !== 'true',
+      allowedHosts: ['sb-5ei93uo72ftd.vercel.run', 'localhost', '127.0.0.1'],
     },
   };
 });
