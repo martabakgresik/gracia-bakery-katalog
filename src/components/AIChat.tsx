@@ -142,17 +142,19 @@ export function AIChat() {
   return (
     <>
       {/* Floating Button */}
-      <button
-        onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 px-4 py-3 bg-primary text-white rounded-full shadow-lg hover:bg-primary-light transition-all hover:scale-105 active:scale-95 ${isOpen ? 'hidden' : 'flex'} items-center gap-2 group`}
-        aria-label="Tanya Kami"
-      >
-        <div className="relative">
-          <Store className="w-6 h-6" />
-          <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-500 border-2 border-primary rounded-full animate-pulse"></span>
-        </div>
-        <span className="font-medium text-sm whitespace-nowrap">Tanya Kami</span>
-      </button>
+      <div className={`fixed bottom-6 right-6 z-40 ${isOpen ? 'hidden' : 'flex'} flex-col items-center gap-1.5`}>
+        <button
+          onClick={() => setIsOpen(true)}
+          className="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:bg-primary-light transition-all hover:scale-105 active:scale-95 group"
+          aria-label="Tanya Kami"
+        >
+          <div className="relative">
+            <Store className="w-6 h-6" />
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-green-500 border-2 border-primary rounded-full animate-pulse"></span>
+          </div>
+        </button>
+        <span className="font-bold text-[10px] uppercase tracking-widest text-stone-600 dark:text-stone-400 bg-white/90 dark:bg-stone-800/90 px-2 py-0.5 rounded-full backdrop-blur-sm shadow-sm border border-stone-200 dark:border-stone-700">👋 Tanya Kami</span>
+      </div>
 
       {/* Chat Window */}
       <AnimatePresence>
