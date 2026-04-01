@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { X, ShoppingBag, Star, StarHalf, Share2, Heart } from 'lucide-react';
-import { Product } from '../types';
+import { Product, ProductVariant } from '../types';
 import { shareProduct } from '../utils/share';
 
 interface ProductModalProps {
   product: Product | null;
   isOpen: boolean;
   onClose: () => void;
-  onAddToCart: (product: Product, variant?: string) => void;
+  onAddToCart: (product: Product, variant?: string | ProductVariant) => void;
   onRate: (productId: string, rating: number) => void;
   isWishlisted: boolean;
   onToggleWishlist: (product: Product) => void;
 }
 
 export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, isWishlisted, onToggleWishlist }: ProductModalProps) {
-  const [selectedVariant, setSelectedVariant] = useState<string>('');
+  const [selectedVariant, setSelectedVariant] = useState<string | ProductVariant>('');
   const [hoverRating, setHoverRating] = useState(0);
   const [hasRated, setHasRated] = useState(false);
 
@@ -29,6 +29,18 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
   }, [product?.id]);
 
   if (!isOpen || !product) return null;
+
+  const getVariantName = (v: string | ProductVariant) => {
+    if (typeof v === 'string') return v;
+    return v.name;
+  };
+
+  const getVariantPrice = (v: string | ProductVariant) => {
+    if (typeof v === 'string' || !v.price) return product.price;
+    return v.price;
+  };
+
+  const currentPrice = selectedVariant ? getVariantPrice(selectedVariant) : product.price;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -110,7 +122,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
             </div>
 
             <p className="text-2xl font-semibold text-primary dark:text-primary-light mb-6">
-              {formatPrice(product.price)}
+              {formatPrice(currentPrice)}
             </p>
             
             <div className="prose prose-stone dark:prose-invert prose-sm mb-8">
@@ -126,19 +138,28 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
                   Pilih Varian
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {product.variants.map((variant) => (
-                    <button
-                      key={variant}
-                      onClick={() => setSelectedVariant(variant)}
-                      className={`px-4 py-3 rounded-xl border text-sm font-medium text-left transition-all ${
-                        selectedVariant === variant
-                          ? 'border-primary bg-primary/5 text-primary dark:text-primary-light dark:border-primary-light dark:bg-primary/10 shadow-sm'
-                          : 'border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800'
-                      }`}
-                    >
-                      {variant}
-                    </button>
-                  ))}
+                  {product.variants.map((variant) => {
+                    const vName = getVariantName(variant);
+                    const vPrice = getVariantPrice(variant);
+                    const isSelected = getVariantName(selectedVariant) === vName;
+                    
+                    return (
+                      <button
+                        key={vName}
+                        onClick={() => setSelectedVariant(variant)}
+                        className={`px-4 py-3 rounded-xl border text-sm font-medium text-left transition-all flex flex-col gap-1 ${
+                          isSelected
+                            ? 'border-primary bg-primary/5 text-primary dark:text-primary-light dark:border-primary-light dark:bg-primary/10 shadow-sm'
+                            : 'border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:border-stone-300 dark:hover:border-stone-600 hover:bg-stone-50 dark:hover:bg-stone-800'
+                        }`}
+                      >
+                        <span>{vName}</span>
+                        {typeof variant !== 'string' && variant.price && (
+                          <span className="text-xs opacity-70">{formatPrice(vPrice)}</span>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             )}

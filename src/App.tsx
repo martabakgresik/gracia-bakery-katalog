@@ -15,9 +15,13 @@ import { CookieBanner } from './components/CookieBanner';
 import { About } from './components/About';
 import { FAQ } from './components/FAQ';
 import { products } from './data/products';
-import { Product, CartItem, Order } from './types';
+import { Product, CartItem, Order, ProductVariant, PromoCode } from './types';
 
 const CATEGORIES = ['Semua', 'Roti', 'Jajanan Pasar', 'Kue Kering', 'Donat'];
+
+const PROMO_CODES: PromoCode[] = [
+  { code: 'graciadiskon', discountPercent: 10, description: 'Diskon 10% untuk pemesan pertama' }
+];
 
 export default function App() {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
@@ -39,6 +43,7 @@ export default function App() {
     }
   });
   const [isLoading, setIsLoading] = useState(true);
+  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
   useEffect(() => {
     // Simulate fetching products or background operations
@@ -75,10 +80,14 @@ export default function App() {
     });
   };
 
-  const handleAddToCart = (product: Product, variant?: string) => {
+  const handleAddToCart = (product: Product, variant?: string | ProductVariant) => {
     // If product has variants but none was selected (e.g. from direct card click), default to the first variant
     const finalVariant = variant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
-    const cartItemId = finalVariant ? `${product.id}-${finalVariant}` : product.id;
+    
+    const variantName = typeof finalVariant === 'string' ? finalVariant : finalVariant?.name;
+    const variantPrice = (typeof finalVariant !== 'string' && finalVariant?.price) ? finalVariant.price : product.price;
+    
+    const cartItemId = variantName ? `${product.id}-${variantName}` : product.id;
 
     setCartItems(prev => {
       const existingItem = prev.find(item => item.cartItemId === cartItemId);
@@ -89,13 +98,18 @@ export default function App() {
             : item
         );
       }
-      return [...prev, { ...product, quantity: 1, selectedVariant: finalVariant, cartItemId }];
+      return [...prev, { 
+        ...product, 
+        price: variantPrice, 
+        quantity: 1, 
+        selectedVariant: finalVariant, 
+        cartItemId 
+      }];
     });
     
     toast.success('Berhasil ditambahkan', { 
-      description: `${product.name} ${finalVariant ? `(${finalVariant})` : ''} masuk ke keranjang.` 
+      description: `${product.name} ${variantName ? `(${variantName})` : ''} masuk ke keranjang.` 
     });
-    // setIsCartOpen(true); // Optional: you can keep this or remove it since we have toasts now. Let's remove it for a smoother experience.
   };
 
   const handleUpdateQuantity = (cartItemId: string, delta: number) => {
@@ -120,13 +134,33 @@ export default function App() {
 
   const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
   const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = appliedPromo ? (cartTotal * appliedPromo.discountPercent) / 100 : 0;
+  const finalTotal = cartTotal - discountAmount;
+
+  const handleApplyPromo = (code: string) => {
+    const promo = PROMO_CODES.find(p => p.code.toLowerCase() === code.toLowerCase());
+    if (promo) {
+      setAppliedPromo(promo);
+      toast.success('Promo Berhasil', { 
+        description: `Kode ${promo.code} berhasil digunakan! Anda hemat ${promo.discountPercent}%.` 
+      });
+      return true;
+    } else {
+      toast.error('Promo Gagal', { 
+        description: 'Kode promo tidak valid atau sudah tidak berlaku.' 
+      });
+      return false;
+    }
+  };
 
   const handleCheckoutSuccess = () => {
     const newOrder: Order = {
       id: `ORD-${Date.now()}`,
       date: new Date().toISOString(),
       items: [...cartItems],
-      total: cartTotal,
+      total: finalTotal,
+      discount: discountAmount,
+      promoCode: appliedPromo?.code,
       status: 'Menunggu Konfirmasi'
     };
     
@@ -139,6 +173,7 @@ export default function App() {
     }
     
     setCartItems([]);
+    setAppliedPromo(null);
     setIsCartOpen(false);
     toast.success('Pesanan Berhasil', { 
       description: 'Pesanan Anda telah dicatat di riwayat pesanan.' 
@@ -179,15 +214,13 @@ export default function App() {
       <Header 
         cartItemCount={totalItems} 
         onOpenCart={() => setIsCartOpen(true)} 
-        searchQuery={searchQuery}
-        onSearchChange={setSearchQuery}
         wishlistCount={wishlistIds.length}
         onOpenWishlist={() => setIsWishlistOpen(true)}
         onOpenHistory={() => setIsHistoryOpen(true)}
       />
       
       <main className="flex-grow">
-        <Hero />
+        <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
         
         <section id="menu" className="py-20 bg-[#FDFBF7] dark:bg-stone-900 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -253,6 +286,9 @@ export default function App() {
         onUpdateQuantity={handleUpdateQuantity}
         onRemove={handleRemoveItem}
         onCheckout={handleCheckoutSuccess}
+        appliedPromo={appliedPromo}
+        onApplyPromo={handleApplyPromo}
+        onRemovePromo={() => setAppliedPromo(null)}
       />
 
       <Wishlist

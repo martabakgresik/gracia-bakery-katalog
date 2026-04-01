@@ -93,7 +93,9 @@ export function OrderHistory({ isOpen, onClose, orders }: OrderHistoryProps) {
                         <div key={idx} className="flex justify-between text-sm">
                           <div className="flex gap-2 text-stone-600 dark:text-stone-300">
                             <span className="font-medium text-stone-900 dark:text-stone-100">{item.quantity}x</span>
-                            <span className="line-clamp-1">{item.name} {item.selectedVariant ? `(${item.selectedVariant})` : ''}</span>
+                            <span className="line-clamp-1">
+                              {item.name} {item.selectedVariant ? `(${typeof item.selectedVariant === 'string' ? item.selectedVariant : item.selectedVariant.name})` : ''}
+                            </span>
                           </div>
                           <span className="text-stone-900 dark:text-stone-100 font-medium whitespace-nowrap ml-4">
                             {formatPrice(item.price * item.quantity)}

@@ -1,3 +1,8 @@
+export interface ProductVariant {
+  name: string;
+  price?: number;
+}
+
 export interface Product {
   id: string;
   name: string;
@@ -6,15 +11,15 @@ export interface Product {
   price: number;
   image: string;
   category: 'Roti' | 'Jajanan Pasar' | 'Kue Kering' | 'Donat';
-  variants?: string[];
+  variants?: (string | ProductVariant)[];
   rating: number;
   reviewCount: number;
 }
 
-export interface CartItem extends Product {
+export interface CartItem extends Omit<Product, 'variants'> {
   cartItemId: string;
   quantity: number;
-  selectedVariant?: string;
+  selectedVariant?: string | ProductVariant;
 }
 
 export interface Order {
@@ -22,5 +27,13 @@ export interface Order {
   date: string;
   items: CartItem[];
   total: number;
+  discount?: number;
+  promoCode?: string;
   status: 'Menunggu Konfirmasi' | 'Diproses' | 'Selesai';
+}
+
+export interface PromoCode {
+  code: string;
+  discountPercent: number;
+  description: string;
 }

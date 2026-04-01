@@ -5,14 +5,12 @@ import { ThemeToggle } from './ThemeToggle';
 interface HeaderProps {
   cartItemCount: number;
   onOpenCart: () => void;
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
   wishlistCount: number;
   onOpenWishlist: () => void;
   onOpenHistory: () => void;
 }
 
-export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange, wishlistCount, onOpenWishlist, onOpenHistory }: HeaderProps) {
+export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlist, onOpenHistory }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -38,27 +36,11 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
           </div>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex ml-8 space-x-6 items-center">
+          <nav className="hidden lg:flex ml-8 space-x-8 items-center">
             <a href="#menu" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Menu</a>
             <a href="#about" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Tentang Kami</a>
             <a href="#faq" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">FAQ</a>
           </nav>
-
-          {/* Desktop Search */}
-          <div className="hidden md:flex flex-1 max-w-md mx-6">
-            <div className="relative w-full">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <Search className="h-4 w-4 text-stone-400 dark:text-stone-500" />
-              </div>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder="Cari roti, kue..."
-                className="block w-full pl-11 pr-4 py-2.5 border border-stone-200 dark:border-stone-700 rounded-full leading-5 bg-stone-50 dark:bg-stone-800 placeholder-stone-400 dark:placeholder-stone-500 text-stone-900 dark:text-stone-100 focus:outline-none focus:bg-white dark:focus:bg-stone-900 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200"
-              />
-            </div>
-          </div>
 
           {/* Desktop Contact & Cart */}
           <div className="flex items-center space-x-2 md:space-x-4">
@@ -107,21 +89,7 @@ export function Header({ cartItemCount, onOpenCart, searchQuery, onSearchChange,
           </div>
         </div>
 
-        {/* Mobile Search */}
-        <div className="md:hidden pb-4">
-          <div className="relative w-full">
-            <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-              <Search className="h-4 w-4 text-stone-400 dark:text-stone-500" />
-            </div>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => onSearchChange(e.target.value)}
-              placeholder="Cari roti, kue..."
-              className="block w-full pl-11 pr-4 py-2.5 border border-stone-200 dark:border-stone-700 rounded-full leading-5 bg-stone-50 dark:bg-stone-800 placeholder-stone-400 dark:placeholder-stone-500 text-stone-900 dark:text-stone-100 focus:outline-none focus:bg-white dark:focus:bg-stone-900 focus:ring-1 focus:ring-primary focus:border-primary sm:text-sm transition-all duration-200"
-            />
-          </div>
-        </div>
+        {/* Mobile Search - Removed as it's now in Hero */}
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (

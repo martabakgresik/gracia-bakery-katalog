@@ -1,5 +1,6 @@
-import { X, Minus, Plus, MessageCircle } from 'lucide-react';
-import { CartItem } from '../types';
+import { useState } from 'react';
+import { X, Minus, Plus, MessageCircle, Tag, Ticket } from 'lucide-react';
+import { CartItem, PromoCode } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface CartProps {
@@ -9,10 +10,26 @@ interface CartProps {
   onUpdateQuantity: (cartItemId: string, delta: number) => void;
   onRemove: (cartItemId: string) => void;
   onCheckout: () => void;
+  appliedPromo: PromoCode | null;
+  onApplyPromo: (code: string) => boolean;
+  onRemovePromo: () => void;
 }
 
-export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onCheckout }: CartProps) {
-  const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+export function Cart({ 
+  isOpen, 
+  onClose, 
+  items, 
+  onUpdateQuantity, 
+  onRemove, 
+  onCheckout,
+  appliedPromo,
+  onApplyPromo,
+  onRemovePromo
+}: CartProps) {
+  const [promoInput, setPromoInput] = useState('');
+  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const discountAmount = appliedPromo ? (subtotal * appliedPromo.discountPercent) / 100 : 0;
+  const total = subtotal - discountAmount;
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -29,9 +46,17 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
     
     let message = 'Halo Gracia Bakery, saya ingin memesan:\n\n';
     items.forEach(item => {
-      const variantText = item.selectedVariant ? ` (${item.selectedVariant})` : '';
+      const variantName = typeof item.selectedVariant === 'string' 
+        ? item.selectedVariant 
+        : item.selectedVariant?.name;
+      const variantText = variantName ? ` (${variantName})` : '';
       message += `- ${item.quantity}x ${item.name}${variantText} - ${formatPrice(item.price * item.quantity)}\n`;
     });
+    
+    if (appliedPromo) {
+      message += `\nSubtotal: ${formatPrice(subtotal)}\n`;
+      message += `Diskon (${appliedPromo.code}): -${formatPrice(discountAmount)}\n`;
+    }
     
     message += `\n*Total: ${formatPrice(total)}*\n\n`;
     message += 'Mohon info untuk pembayaran dan pengiriman. Terima kasih!';
@@ -39,6 +64,14 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     onCheckout();
+  };
+
+  const handleApplyPromo = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!promoInput.trim()) return;
+    if (onApplyPromo(promoInput)) {
+      setPromoInput('');
+    }
   };
 
   if (!isOpen) return null;
@@ -105,7 +138,9 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
                           </button>
                         </div>
                         {item.selectedVariant && (
-                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">{item.selectedVariant}</p>
+                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                            {typeof item.selectedVariant === 'string' ? item.selectedVariant : item.selectedVariant.name}
+                          </p>
                         )}
                         <p className="text-primary dark:text-primary-light font-medium text-sm mt-1">{formatPrice(item.price)}</p>
                       </div>
@@ -136,9 +171,61 @@ export function Cart({ isOpen, onClose, items, onUpdateQuantity, onRemove, onChe
 
         {items.length > 0 && (
           <div className="border-t border-stone-100 dark:border-stone-800 p-6 bg-stone-50 dark:bg-stone-900/50">
-            <div className="flex justify-between items-center mb-6">
-              <span className="text-stone-600 dark:text-stone-400 font-medium">Total Pesanan</span>
-              <span className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">{formatPrice(total)}</span>
+            {/* Promo Code Section */}
+            <div className="mb-6">
+              {appliedPromo ? (
+                <div className="flex items-center justify-between p-3 bg-primary/10 border border-primary/20 rounded-xl">
+                  <div className="flex items-center gap-2">
+                    <Tag className="w-4 h-4 text-primary" />
+                    <div>
+                      <p className="text-sm font-bold text-primary">{appliedPromo.code}</p>
+                      <p className="text-[10px] text-primary/70">{appliedPromo.description}</p>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={onRemovePromo}
+                    className="text-primary hover:text-primary-dark p-1"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <form onSubmit={handleApplyPromo} className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Ticket className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-stone-400" />
+                    <input
+                      type="text"
+                      value={promoInput}
+                      onChange={(e) => setPromoInput(e.target.value)}
+                      placeholder="Kode Promo"
+                      className="w-full pl-9 pr-4 py-2.5 bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all"
+                    />
+                  </div>
+                  <button
+                    type="submit"
+                    className="px-4 py-2.5 bg-stone-900 dark:bg-stone-700 text-white rounded-xl text-sm font-medium hover:bg-stone-800 dark:hover:bg-stone-600 transition-colors"
+                  >
+                    Pakai
+                  </button>
+                </form>
+              )}
+            </div>
+
+            <div className="space-y-2 mb-6">
+              <div className="flex justify-between items-center text-stone-600 dark:text-stone-400">
+                <span className="text-sm">Subtotal</span>
+                <span className="font-medium">{formatPrice(subtotal)}</span>
+              </div>
+              {appliedPromo && (
+                <div className="flex justify-between items-center text-primary">
+                  <span className="text-sm">Diskon ({appliedPromo.discountPercent}%)</span>
+                  <span className="font-medium">-{formatPrice(discountAmount)}</span>
+                </div>
+              )}
+              <div className="flex justify-between items-center pt-2 border-t border-stone-200 dark:border-stone-800">
+                <span className="font-medium text-stone-900 dark:text-stone-100">Total Akhir</span>
+                <span className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">{formatPrice(total)}</span>
+              </div>
             </div>
             <button
               onClick={handleCheckout}

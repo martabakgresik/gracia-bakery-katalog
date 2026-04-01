@@ -82,9 +82,14 @@ export function ProductCard({ product, onAddToCart, onClick, isWishlisted, onTog
         </div>
         
         <div className="flex items-center justify-between mt-auto pt-4 border-t border-stone-100 dark:border-stone-700">
-          <span className="text-lg font-semibold text-primary dark:text-primary-light">
-            {formatPrice(product.price)}
-          </span>
+          <div className="flex flex-col">
+            {product.variants && product.variants.length > 1 && product.variants.some(v => typeof v !== 'string' && v.price && v.price !== product.price) && (
+              <span className="text-[10px] uppercase tracking-wider text-stone-400 dark:text-stone-500 font-bold mb-0.5">Mulai dari</span>
+            )}
+            <span className="text-lg font-semibold text-primary dark:text-primary-light">
+              {formatPrice(product.price)}
+            </span>
+          </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleShareClick}
