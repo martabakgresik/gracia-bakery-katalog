@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Cormorant Garamond", ui-serif, Georgia, Cambria, "Times New Roman", Times, serif;
+  
+  --color-primary: #8B4513; /* SaddleBrown */
+  --color-primary-light: #A0522D; /* Sienna */
+  --color-background: #FDFBF7; /* Warm off-white */
+  --color-surface: #FFFFFF;
+}
+
+body {
+  @apply bg-[#FDFBF7] dark:bg-stone-900 text-[#2D241E] dark:text-stone-100 transition-colors duration-300;
+}
