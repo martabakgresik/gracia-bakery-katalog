@@ -111,9 +111,7 @@ export function AIChat() {
         body: JSON.stringify({
           messages: apiMessages,
           model: 'openai',
-          seed: 42,
-          modalities: ['text'],
-          response_format: { type: 'text' }
+          seed: 42
         })
       });
 
