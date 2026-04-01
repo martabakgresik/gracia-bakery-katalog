@@ -7,7 +7,7 @@ export const products: Product[] = [
     description: 'Kue kering isi selai nanas asli yang lumer di mulut dengan olesan telur keemasan.',
     longDescription: 'Nastar Klasik Gracia Bakery dibuat menggunakan resep turun-temurun dengan mentega premium (butter) yang membuatnya sangat lumer di mulut. Isian selai nanas dibuat secara homemade dari nanas segar pilihan yang dimasak perlahan hingga karamelisasi sempurna, memberikan perpaduan rasa manis dan asam yang menyegarkan.',
     price: 85000,
-    image: '/nastar.webp',
+    image: './nastar.webp',
     category: 'Kue Kering',
     variants: [
       { name: 'Toples 250gr', price: 85000 },
@@ -23,7 +23,7 @@ export const products: Product[] = [
     description: 'Ketan gurih isi daging ayam cincang berbumbu rempah rahasia, dibungkus daun pisang.',
     longDescription: 'Jajanan pasar favorit sepanjang masa. Ketan putih pilihan dimasak dengan santan kental segar dan daun pandan hingga pulen dan gurih. Diisi dengan suwiran daging ayam kampung asli yang dimasak dengan bumbu rempah rahasia keluarga, kemudian dibungkus dengan daun pisang batu yang memberikan aroma khas saat dikukus.',
     price: 6000,
-    image: '/lemper-ayam.webp',
+    image: './lemper-ayam.webp',
     category: 'Jajanan Pasar',
     variants: [
       { name: 'Per Biji', price: 6000 },
@@ -39,7 +39,7 @@ export const products: Product[] = [
     description: 'Donat empuk dengan taburan gula halus yang manisnya pas untuk teman ngopi.',
     longDescription: 'Kembali ke masa lalu dengan Donat Gula Klasik kami. Adonan donat diuleni hingga kalis sempurna, menghasilkan tekstur yang sangat empuk dan ringan. Digoreng dengan suhu yang tepat agar tidak berminyak, lalu ditaburi dengan gula halus berkualitas yang lumer seketika di lidah.',
     price: 5000,
-    image: '/donat.webp',
+    image: './donat.webp',
     category: 'Donat',
     variants: ['Gula Halus', 'Gula Kayu Manis'],
     rating: 4.8,
@@ -51,7 +51,7 @@ export const products: Product[] = [
     description: 'Kue kering renyah dengan taburan choco chips premium yang melimpah.',
     longDescription: 'Bagi para pecinta coklat, cookies ini adalah pilihan sempurna. Dibuat dengan dark chocolate powder premium dan dipenuhi dengan choco chips Belgia di setiap gigitannya. Teksturnya renyah di luar namun sedikit chewy di bagian tengah.',
     price: 65000,
-    image: '/coklat-cookies.webp',
+    image: './coklat-cookies.webp',
     category: 'Kue Kering',
     variants: [
       { name: 'Toples 250gr', price: 65000 },
@@ -67,7 +67,7 @@ export const products: Product[] = [
     description: 'Roti sobek super lembut dengan isian coklat dan keju yang lumer.',
     longDescription: 'Roti sobek andalan Gracia Bakery yang selalu fresh dari oven setiap pagi. Menggunakan metode tangzhong Jepang untuk memastikan kelembutan roti bertahan berhari-hari tanpa pengawet. Tersedia dalam berbagai pilihan isian yang melimpah dan memanjakan lidah.',
     price: 25000,
-    image: '/roti-sobek.webp',
+    image: './roti-sobek.webp',
     category: 'Roti',
     variants: ['Coklat Keju', 'Coklat Kacang', 'Full Keju', 'Srikaya'],
     rating: 4.8,
@@ -79,7 +79,7 @@ export const products: Product[] = [
     description: 'Kue kering gurih dengan taburan keju edam pilihan yang renyah dan wangi.',
     longDescription: 'Kastengel premium yang dibuat khusus bagi pecinta keju sejati. Kami menggunakan campuran keju Edam dan Gouda berkualitas tinggi di dalam adonan, serta taburan keju Cheddar renyah di atasnya. Menghasilkan aroma keju yang sangat kuat dan tekstur yang renyah ngeprul.',
     price: 90000,
-    image: '/kastangel.webp',
+    image: './kastangel.webp',
     category: 'Kue Kering',
     variants: [
       { name: 'Toples 250gr', price: 90000 },
