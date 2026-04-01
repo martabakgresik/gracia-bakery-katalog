@@ -5,15 +5,24 @@ export function PromoBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const isDismissed = sessionStorage.getItem('promo_dismissed');
-    if (!isDismissed) setIsVisible(true);
+    try {
+      const isDismissed = sessionStorage.getItem('promo_dismissed');
+      if (!isDismissed) setIsVisible(true);
+    } catch (e) {
+      console.error('Error loading promo status:', e);
+      setIsVisible(true);
+    }
   }, []);
 
   if (!isVisible) return null;
 
   const handleClose = () => {
     setIsVisible(false);
-    sessionStorage.setItem('promo_dismissed', 'true');
+    try {
+      sessionStorage.setItem('promo_dismissed', 'true');
+    } catch (e) {
+      console.error('Error saving promo status:', e);
+    }
   };
 
   return (

@@ -30,8 +30,13 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isHistoryOpen, setIsHistoryOpen] = useState(false);
   const [orders, setOrders] = useState<Order[]>(() => {
-    const saved = localStorage.getItem('gracia_orders');
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem('gracia_orders');
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error('Error loading orders from localStorage:', e);
+      return [];
+    }
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -127,7 +132,11 @@ export default function App() {
     
     const updatedOrders = [newOrder, ...orders];
     setOrders(updatedOrders);
-    localStorage.setItem('gracia_orders', JSON.stringify(updatedOrders));
+    try {
+      localStorage.setItem('gracia_orders', JSON.stringify(updatedOrders));
+    } catch (e) {
+      console.error('Error saving orders to localStorage:', e);
+    }
     
     setCartItems([]);
     setIsCartOpen(false);

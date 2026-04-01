@@ -6,8 +6,14 @@ import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
 import ReactMarkdown from 'react-markdown';
 
-// Initialize Gemini API
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Lazy initialize Gemini API
+let aiInstance: GoogleGenAI | null = null;
+const getAI = () => {
+  if (!aiInstance) {
+    aiInstance = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || '' });
+  }
+  return aiInstance;
+};
 
 interface Message {
   role: 'user' | 'model';
@@ -78,7 +84,7 @@ export function AIChat() {
       }));
       contents.push({ role: 'user', parts: [{ text: userText }] });
 
-      const response = await ai.models.generateContent({
+      const response = await getAI().models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: contents,
         config: {

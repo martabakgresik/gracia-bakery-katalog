@@ -4,12 +4,21 @@ export function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem('cookie_consent');
-    if (!consent) setIsVisible(true);
+    try {
+      const consent = localStorage.getItem('cookie_consent');
+      if (!consent) setIsVisible(true);
+    } catch (e) {
+      console.error('Error loading cookie consent:', e);
+      setIsVisible(true);
+    }
   }, []);
 
   const handleAccept = () => {
-    localStorage.setItem('cookie_consent', 'true');
+    try {
+      localStorage.setItem('cookie_consent', 'true');
+    } catch (e) {
+      console.error('Error saving cookie consent:', e);
+    }
     setIsVisible(false);
   };
 
