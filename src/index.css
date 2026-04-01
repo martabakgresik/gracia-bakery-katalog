@@ -12,6 +12,10 @@
   --color-surface: #FFFFFF;
 }
 
+html, body {
+  @apply overflow-x-hidden w-full;
+}
+
 body {
   @apply bg-[#FDFBF7] dark:bg-stone-900 text-[#2D241E] dark:text-stone-100 transition-colors duration-300;
 }

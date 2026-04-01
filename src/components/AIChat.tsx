@@ -94,17 +94,26 @@ export function AIChat() {
       6. Wajib gunakan format Markdown tekstual untuk memikat bacaan: gunakan **tebal** (bold) untuk nama produk, harga, atau highlight penting, gunakan *miring* (italic) untuk penekanan rasa/upselling, dan gunakan ~~coret~~ (strikethrough) jika sedang mempromosikan diskon "harga coret".
       7. Gunakan Markdown URL untuk link WhatsApp (opsional namun sangat disarankan jika pelanggan ingin beli).`;
 
-      const response = await fetch('/api/chat', {
+      const apiKey = import.meta.env.VITE_POLLINATIONS_API_KEY;
+
+      const apiMessages = [
+        { role: 'system', content: systemInstruction },
+        ...messages.map(m => ({ role: m.role, content: m.text })),
+        { role: 'user', content: userText }
+      ];
+
+      const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
         },
         body: JSON.stringify({
-          messages: [
-            { role: 'system', content: systemInstruction },
-            { role: 'user', content: userText }
-          ],
-          model: 'openai'
+          messages: apiMessages,
+          model: 'openai',
+          seed: 42,
+          modalities: ['text'],
+          response_format: { type: 'text' }
         })
       });
 
