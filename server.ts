@@ -15,14 +15,15 @@ async function startServer() {
 
   app.use(express.json());
 
-  // API Proxy Route for Pollinations
+  // API Proxy Route for Pollinations AI
   app.post("/api/chat", async (req, res) => {
-    const { messages, model } = req.body;
+    const { messages, model, seed } = req.body;
     const apiKey = process.env.POLLINATIONS_API_KEY;
 
-    // Fallback to public endpoint if no API key is provided
-    // but the user provided a reference that uses an API key, so we'll try to use it.
-    
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: "Invalid messages array provided" });
+    }
+
     try {
       const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
         method: 'POST',
@@ -33,20 +34,33 @@ async function startServer() {
         body: JSON.stringify({
           messages: messages,
           model: model || 'openai',
-          seed: 42
+          seed: seed || 42
         })
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        return res.status(response.status).json(errorData);
+        const errorText = await response.text();
+        console.error(`AI API Error (${response.status}):`, errorText);
+        return res.status(response.status).json({ 
+          error: "AI service returned an error",
+          status: response.status 
+        });
       }
 
       const data = await response.json();
+      
+      // Basic validation of the response structure
+      if (!data.choices?.[0]?.message?.content) {
+        throw new Error("Invalid response format from AI provider");
+      }
+
       res.json(data);
-    } catch (error) {
-      console.error('Error in AI Proxy:', error);
-      res.status(500).json({ error: 'Failed to communicate with AI provider' });
+    } catch (error: any) {
+      console.error('Error in AI Proxy:', error.message);
+      res.status(500).json({ 
+        error: 'Failed to communicate with AI provider',
+        message: error.message 
+      });
     }
   });
 

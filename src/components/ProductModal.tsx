@@ -2,21 +2,29 @@ import { useState, useEffect } from 'react';
 import { X, ShoppingBag, Star, StarHalf, Share2, Heart } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { shareProduct } from '../utils/share';
+import { useStore } from '../store/useStore';
 
-interface ProductModalProps {
-  product: Product | null;
-  isOpen: boolean;
-  onClose: () => void;
-  onAddToCart: (product: Product, variant?: string | ProductVariant) => void;
-  onRate: (productId: string, rating: number) => void;
-  isWishlisted: boolean;
-  onToggleWishlist: (product: Product) => void;
-}
+export function ProductModal() {
+  const { 
+    productList,
+    selectedProductId,
+    setSelectedProductId,
+    addToCart, 
+    rateProduct, 
+    wishlistIds, 
+    toggleWishlist 
+  } = useStore();
 
-export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, isWishlisted, onToggleWishlist }: ProductModalProps) {
+  const product = productList.find(p => p.id === selectedProductId) || null;
+  const isOpen = selectedProductId !== null;
+
   const [selectedVariant, setSelectedVariant] = useState<string | ProductVariant>('');
   const [hoverRating, setHoverRating] = useState(0);
   const [hasRated, setHasRated] = useState(false);
+  
+  const isWishlisted = product ? wishlistIds.includes(product.id) : false;
+
+  const onClose = () => setSelectedProductId(null);
 
   useEffect(() => {
     setHasRated(false);
@@ -51,7 +59,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
   };
 
   const handleAddToCart = () => {
-    onAddToCart(product, selectedVariant || undefined);
+    addToCart(product, selectedVariant || undefined);
     onClose();
   };
 
@@ -180,7 +188,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
                   <button
                     key={star}
                     onClick={() => {
-                      onRate(product.id, star);
+                      rateProduct(product.id, star);
                       setHasRated(true);
                     }}
                     onMouseEnter={() => setHoverRating(star)}
@@ -203,7 +211,7 @@ export function ProductModal({ product, isOpen, onClose, onAddToCart, onRate, is
           {/* Action Footer */}
           <div className="pt-6 mt-auto border-t border-stone-100 dark:border-stone-800 flex gap-3">
             <button
-              onClick={() => onToggleWishlist(product)}
+              onClick={() => toggleWishlist(product)}
               className="flex items-center justify-center w-14 h-14 rounded-xl border border-stone-200 dark:border-stone-700 text-stone-600 dark:text-stone-300 hover:bg-stone-50 dark:hover:bg-stone-800 transition-colors duration-200 shrink-0"
               aria-label={isWishlisted ? "Hapus dari wishlist" : "Tambah ke wishlist"}
             >

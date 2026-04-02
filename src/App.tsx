@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Toaster, toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import { Header } from './components/Header';
@@ -14,189 +14,38 @@ import { PromoBanner } from './components/PromoBanner';
 import { CookieBanner } from './components/CookieBanner';
 import { About } from './components/About';
 import { FAQ } from './components/FAQ';
-import { products } from './data/products';
-import { APP_CONFIG } from './data/config';
-import { Product, CartItem, Order, ProductVariant, PromoCode } from './types';
+import { useStore } from './store/useStore';
+import { Product, Order } from './types';
 
 const CATEGORIES = ['Semua', 'Roti', 'Jajanan Pasar', 'Kue Kering', 'Donat'];
 
-const PROMO_CODES: PromoCode[] = [
-  APP_CONFIG.activePromo
-];
-
 export default function App() {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState('Semua');
-  const [searchQuery, setSearchQuery] = useState('');
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [productList, setProductList] = useState<Product[]>(products);
-  const [wishlistIds, setWishlistIds] = useState<string[]>([]);
-  const [isWishlistOpen, setIsWishlistOpen] = useState(false);
-  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
-  const [orders, setOrders] = useState<Order[]>(() => {
-    try {
-      const saved = localStorage.getItem('gracia_orders');
-      return saved ? JSON.parse(saved) : [];
-    } catch (e) {
-      console.error('Error loading orders from localStorage:', e);
-      return [];
-    }
-  });
+  const {
+    productList,
+    searchQuery,
+    selectedCategory,
+    setSelectedCategory,
+  } = useStore();
+
   const [isLoading, setIsLoading] = useState(true);
-  const [appliedPromo, setAppliedPromo] = useState<PromoCode | null>(null);
 
   useEffect(() => {
-    // Simulate fetching products or background operations
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 1500);
+    const timer = setTimeout(() => setIsLoading(false), 1500);
     return () => clearTimeout(timer);
   }, []);
 
-  const handleRateProduct = (productId: string, rating: number) => {
-    setProductList(prev => prev.map(p => {
-      if (p.id === productId) {
-        const newCount = p.reviewCount + 1;
-        const newRating = ((p.rating * p.reviewCount) + rating) / newCount;
-        return { ...p, rating: newRating, reviewCount: newCount };
-      }
-      return p;
-    }));
-  };
-
-  const toggleWishlist = (product: Product) => {
-    setWishlistIds(prev => {
-      if (prev.includes(product.id)) {
-        toast('Dihapus dari Wishlist', { 
-          description: `${product.name} telah dihapus dari wishlist Anda.` 
-        });
-        return prev.filter(id => id !== product.id);
-      } else {
-        toast.success('Ditambahkan ke Wishlist', { 
-          description: `${product.name} telah ditambahkan ke wishlist Anda.` 
-        });
-        return [...prev, product.id];
-      }
+  const filteredProducts = useMemo(() => {
+    return productList.filter(p => {
+      const matchesCategory = selectedCategory === 'Semua' || p.category === selectedCategory;
+      const searchLower = searchQuery.toLowerCase();
+      const matchesSearch = searchLower === '' || 
+        p.name.toLowerCase().includes(searchLower) || 
+        p.description.toLowerCase().includes(searchLower) ||
+        (p.longDescription?.toLowerCase().includes(searchLower) ?? false);
+      
+      return matchesCategory && matchesSearch;
     });
-  };
-
-  const handleAddToCart = (product: Product, variant?: string | ProductVariant) => {
-    // If product has variants but none was selected (e.g. from direct card click), default to the first variant
-    const finalVariant = variant || (product.variants && product.variants.length > 0 ? product.variants[0] : undefined);
-    
-    const variantName = typeof finalVariant === 'string' ? finalVariant : finalVariant?.name;
-    const variantPrice = (typeof finalVariant !== 'string' && finalVariant?.price) ? finalVariant.price : product.price;
-    
-    const cartItemId = variantName ? `${product.id}-${variantName}` : product.id;
-
-    setCartItems(prev => {
-      const existingItem = prev.find(item => item.cartItemId === cartItemId);
-      if (existingItem) {
-        return prev.map(item => 
-          item.cartItemId === cartItemId 
-            ? { ...item, quantity: item.quantity + 1 }
-            : item
-        );
-      }
-      return [...prev, { 
-        ...product, 
-        price: variantPrice, 
-        quantity: 1, 
-        selectedVariant: finalVariant, 
-        cartItemId 
-      }];
-    });
-    
-    toast.success('Berhasil ditambahkan', { 
-      description: `${product.name} ${variantName ? `(${variantName})` : ''} masuk ke keranjang.` 
-    });
-  };
-
-  const handleUpdateQuantity = (cartItemId: string, delta: number) => {
-    setCartItems(prev => prev.map(item => {
-      if (item.cartItemId === cartItemId) {
-        const newQuantity = Math.max(0, item.quantity + delta);
-        return { ...item, quantity: newQuantity };
-      }
-      return item;
-    }).filter(item => item.quantity > 0));
-  };
-
-  const handleRemoveItem = (cartItemId: string) => {
-    const itemToRemove = cartItems.find(item => item.cartItemId === cartItemId);
-    setCartItems(prev => prev.filter(item => item.cartItemId !== cartItemId));
-    if (itemToRemove) {
-      toast('Item dihapus', { 
-        description: `${itemToRemove.name} telah dihapus dari keranjang.` 
-      });
-    }
-  };
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
-  const cartTotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discountAmount = appliedPromo ? (cartTotal * appliedPromo.discountPercent) / 100 : 0;
-  const finalTotal = cartTotal - discountAmount;
-
-  const handleApplyPromo = (code: string) => {
-    const promo = PROMO_CODES.find(p => p.code.toLowerCase() === code.toLowerCase());
-    if (promo) {
-      setAppliedPromo(promo);
-      toast.success('Promo Berhasil', { 
-        description: `Kode ${promo.code} berhasil digunakan! Anda hemat ${promo.discountPercent}%.` 
-      });
-      return true;
-    } else {
-      toast.error('Promo Gagal', { 
-        description: 'Kode promo tidak valid atau sudah tidak berlaku.' 
-      });
-      return false;
-    }
-  };
-
-  const handleCheckoutSuccess = () => {
-    const newOrder: Order = {
-      id: `ORD-${Date.now()}`,
-      date: new Date().toISOString(),
-      items: [...cartItems],
-      total: finalTotal,
-      discount: discountAmount,
-      promoCode: appliedPromo?.code,
-      status: 'Menunggu Konfirmasi'
-    };
-    
-    const updatedOrders = [newOrder, ...orders];
-    setOrders(updatedOrders);
-    try {
-      localStorage.setItem('gracia_orders', JSON.stringify(updatedOrders));
-    } catch (e) {
-      console.error('Error saving orders to localStorage:', e);
-    }
-    
-    setCartItems([]);
-    setAppliedPromo(null);
-    setIsCartOpen(false);
-    toast.success('Pesanan Berhasil', { 
-      description: 'Pesanan Anda telah dicatat di riwayat pesanan.' 
-    });
-  };
-
-  const filteredProducts = productList.filter(p => {
-    const matchesCategory = selectedCategory === 'Semua' || p.category === selectedCategory;
-    const searchLower = searchQuery.toLowerCase();
-    const matchesSearch = searchLower === '' || 
-      p.name.toLowerCase().includes(searchLower) || 
-      p.description.toLowerCase().includes(searchLower) ||
-      (p.longDescription?.toLowerCase().includes(searchLower) ?? false);
-    
-    return matchesCategory && matchesSearch;
-  });
-
-  const currentSelectedProduct = selectedProduct 
-    ? productList.find(p => p.id === selectedProduct.id) || null 
-    : null;
-
-  const wishlistProducts = productList.filter(p => wishlistIds.includes(p.id));
+  }, [productList, selectedCategory, searchQuery]);
 
   if (isLoading) {
     return (
@@ -212,16 +61,10 @@ export default function App() {
     <div className="min-h-screen flex flex-col font-sans bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 transition-colors duration-300">
       <Toaster position="top-center" />
       <PromoBanner />
-      <Header 
-        cartItemCount={totalItems} 
-        onOpenCart={() => setIsCartOpen(true)} 
-        wishlistCount={wishlistIds.length}
-        onOpenWishlist={() => setIsWishlistOpen(true)}
-        onOpenHistory={() => setIsHistoryOpen(true)}
-      />
+      <Header />
       
       <main className="flex-grow">
-        <Hero searchQuery={searchQuery} onSearchChange={setSearchQuery} />
+        <Hero />
         
         <section id="menu" className="py-20 bg-[#FDFBF7] dark:bg-stone-900 transition-colors duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -255,14 +98,7 @@ export default function App() {
             {/* Product Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map(product => (
-                <ProductCard 
-                  key={product.id} 
-                  product={product} 
-                  onAddToCart={(p) => handleAddToCart(p)} 
-                  onClick={() => setSelectedProduct(product)}
-                  isWishlisted={wishlistIds.includes(product.id)}
-                  onToggleWishlist={toggleWishlist}
-                />
+                <ProductCard key={product.id} product={product} />
               ))}
             </div>
             
@@ -280,44 +116,10 @@ export default function App() {
 
       <Footer />
 
-      <Cart 
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        items={cartItems}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemove={handleRemoveItem}
-        onCheckout={handleCheckoutSuccess}
-        appliedPromo={appliedPromo}
-        onApplyPromo={handleApplyPromo}
-        onRemovePromo={() => setAppliedPromo(null)}
-      />
-
-      <Wishlist
-        isOpen={isWishlistOpen}
-        onClose={() => setIsWishlistOpen(false)}
-        items={wishlistProducts}
-        onRemove={(id) => {
-          const product = productList.find(p => p.id === id);
-          if (product) toggleWishlist(product);
-        }}
-        onAddToCart={(p) => handleAddToCart(p)}
-      />
-
-      <ProductModal
-        product={currentSelectedProduct}
-        isOpen={selectedProduct !== null}
-        onClose={() => setSelectedProduct(null)}
-        onAddToCart={handleAddToCart}
-        onRate={handleRateProduct}
-        isWishlisted={currentSelectedProduct ? wishlistIds.includes(currentSelectedProduct.id) : false}
-        onToggleWishlist={toggleWishlist}
-      />
-
-      <OrderHistory
-        isOpen={isHistoryOpen}
-        onClose={() => setIsHistoryOpen(false)}
-        orders={orders}
-      />
+      <Cart />
+      <Wishlist />
+      <ProductModal />
+      <OrderHistory />
 
       <AIChat />
       <CookieBanner />

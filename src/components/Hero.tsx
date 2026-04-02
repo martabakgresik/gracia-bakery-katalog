@@ -1,14 +1,11 @@
 import { Search } from 'lucide-react';
 import { motion } from 'motion/react';
 import { useState } from 'react';
+import { useStore } from '../store/useStore';
 
-interface HeroProps {
-  searchQuery: string;
-  onSearchChange: (query: string) => void;
-}
-
-export function Hero({ searchQuery, onSearchChange }: HeroProps) {
+export function Hero() {
   const [isFocused, setIsFocused] = useState(false);
+  const { searchQuery, setSearchQuery } = useStore();
 
   return (
     <div className="relative bg-stone-900 overflow-hidden">
@@ -60,7 +57,7 @@ export function Hero({ searchQuery, onSearchChange }: HeroProps) {
               <input
                 type="text"
                 value={searchQuery}
-                onChange={(e) => onSearchChange(e.target.value)}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setIsFocused(false)}
                 placeholder="Cari roti, kue kering favorit Anda..."
