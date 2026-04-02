@@ -98,9 +98,8 @@ export function AIChat() {
       4. Selalu lakukan trik "Upselling" dengan halus. Contoh: Jika Kakak memesan/bertanya tentang Roti Sobek, rekomendasikan juga sekalian Nastar Lumer atau minuman pendampingnya untuk melengkapi pesanan. 
       5. Gunakan bahasa Indonesia yang santai namun tetap sopan dan profesional.
       6. Wajib gunakan format Markdown tekstual untuk memikat bacaan: gunakan **tebal** (bold) untuk nama produk, harga, atau highlight penting, gunakan *miring* (italic) untuk penekanan rasa/upselling, dan gunakan ~~coret~~ (strikethrough) jika sedang mempromosikan diskon "harga coret".
-      7. Gunakan Markdown URL untuk link WhatsApp (opsional namun sangat disarankan jika pelanggan ingin beli).`;
-
-      const apiKey = import.meta.env.VITE_POLLINATIONS_API_KEY;
+      7. Pisahkan antar alinea/paragraf dengan memberikan **jarak baris baru yang jelas (double newline)** agar mudah dibaca. Jangan biarkan kalimat menumpuk terlalu rapat.
+      8. Gunakan Markdown URL untuk link WhatsApp (opsional namun sangat disarankan jika pelanggan ingin beli).`;
 
       const apiMessages = [
         { role: 'system', content: systemInstruction },
@@ -108,11 +107,11 @@ export function AIChat() {
         { role: 'user', content: userText }
       ];
 
-      const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {
+      // Using local API proxy for security
+      const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...(apiKey ? { 'Authorization': `Bearer ${apiKey}` } : {})
         },
         body: JSON.stringify({
           messages: apiMessages,
@@ -122,18 +121,23 @@ export function AIChat() {
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.error || `API Error: ${response.status}`);
       }
 
       const data = await response.json();
       const responseText = data.choices?.[0]?.message?.content;
 
-      if (!responseText) throw new Error('Empty response');
+      if (!responseText) throw new Error('Format respons tidak valid');
 
       setMessages(prev => [...prev, { role: 'assistant', text: responseText }]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('AI Chat Error:', error);
-      setMessages(prev => [...prev, { role: 'assistant', text: 'Maaf, Gracia sedang beristirahat sejenak. Silakan coba lagi sebentar lagi atau hubungi kami via WhatsApp.' }]);
+      const errorMessage = error.message.includes('API Error') 
+        ? 'Maaf, layanan AI kami sedang mengalami gangguan teknis. Mohon hubungi WhatsApp kami untuk bantuan segera.'
+        : 'Maaf, Gracia sedang beristirahat sejenak. Silakan coba lagi sebentar lagi atau hubungi kami via WhatsApp.';
+      
+      setMessages(prev => [...prev, { role: 'assistant', text: errorMessage }]);
     } finally {
       setIsLoading(false);
     }
@@ -226,7 +230,7 @@ export function AIChat() {
                       : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-tl-sm shadow-sm'
                     }`}>
                     {msg.role === 'assistant' ? (
-                      <div className="prose prose-sm prose-stone dark:prose-invert max-w-none">
+                      <div className="prose prose-sm prose-stone dark:prose-invert max-w-none [&_p]:mb-4 last:[&_p]:mb-0 leading-relaxed">
                         <ReactMarkdown
                           components={{
                             a: ({ node, ...props }) => {

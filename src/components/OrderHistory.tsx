@@ -1,14 +1,10 @@
 import { X, History, Package, Clock } from 'lucide-react';
-import { Order } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { useStore } from '../store/useStore';
 
-interface OrderHistoryProps {
-  isOpen: boolean;
-  onClose: () => void;
-  orders: Order[];
-}
+export function OrderHistory() {
+  const { orders, isHistoryOpen, setIsHistoryOpen } = useStore();
 
-export function OrderHistory({ isOpen, onClose, orders }: OrderHistoryProps) {
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -27,14 +23,14 @@ export function OrderHistory({ isOpen, onClose, orders }: OrderHistoryProps) {
     });
   };
 
-  if (!isOpen) return null;
+  if (!isHistoryOpen) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
+        onClick={() => setIsHistoryOpen(false)}
       />
       
       {/* Sidebar */}
@@ -45,7 +41,7 @@ export function OrderHistory({ isOpen, onClose, orders }: OrderHistoryProps) {
             Riwayat Pesanan
           </h2>
           <button 
-            onClick={onClose}
+            onClick={() => setIsHistoryOpen(false)}
             className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
           >
             <X className="w-6 h-6" />
@@ -61,7 +57,7 @@ export function OrderHistory({ isOpen, onClose, orders }: OrderHistoryProps) {
               <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Belum ada pesanan</p>
               <p className="text-sm text-center">Pesanan yang Anda buat akan muncul di sini.</p>
               <button 
-                onClick={onClose}
+                onClick={() => setIsHistoryOpen(false)}
                 className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
               >
                 Mulai Belanja

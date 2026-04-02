@@ -1,16 +1,16 @@
 import { Plus, Star, StarHalf, Share2, Heart } from 'lucide-react';
 import { Product } from '../types';
 import { shareProduct } from '../utils/share';
+import { useStore } from '../store/useStore';
 
 interface ProductCardProps {
   product: Product;
-  onAddToCart: (product: Product) => void;
-  onClick: () => void;
-  isWishlisted: boolean;
-  onToggleWishlist: (product: Product) => void;
 }
 
-export function ProductCard({ product, onAddToCart, onClick, isWishlisted, onToggleWishlist }: ProductCardProps) {
+export function ProductCard({ product }: ProductCardProps) {
+  const { wishlistIds, toggleWishlist, addToCart, setSelectedProductId } = useStore();
+  const isWishlisted = wishlistIds.includes(product.id);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -21,7 +21,11 @@ export function ProductCard({ product, onAddToCart, onClick, isWishlisted, onTog
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onAddToCart(product);
+    addToCart(product);
+  };
+
+  const handleCardClick = () => {
+    setSelectedProductId(product.id);
   };
 
   const handleShareClick = (e: React.MouseEvent) => {
@@ -31,12 +35,12 @@ export function ProductCard({ product, onAddToCart, onClick, isWishlisted, onTog
 
   const handleWishlistClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onToggleWishlist(product);
+    toggleWishlist(product);
   };
 
   return (
     <div 
-      onClick={onClick}
+      onClick={handleCardClick}
       className="group flex flex-col bg-white dark:bg-stone-800 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 border border-stone-100 dark:border-stone-700 cursor-pointer"
     >
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100 dark:bg-stone-900">

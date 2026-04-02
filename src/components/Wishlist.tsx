@@ -1,16 +1,22 @@
+import { useMemo } from 'react';
 import { X, Heart, ShoppingBag } from 'lucide-react';
-import { Product } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { useStore } from '../store/useStore';
 
-interface WishlistProps {
-  isOpen: boolean;
-  onClose: () => void;
-  items: Product[];
-  onRemove: (productId: string) => void;
-  onAddToCart: (product: Product) => void;
-}
+export function Wishlist() {
+  const { 
+    productList, 
+    wishlistIds, 
+    isWishlistOpen, 
+    setIsWishlistOpen, 
+    toggleWishlist, 
+    addToCart 
+  } = useStore();
 
-export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: WishlistProps) {
+  const wishlistProducts = useMemo(() => {
+    return productList.filter(p => wishlistIds.includes(p.id));
+  }, [productList, wishlistIds]);
+
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -19,14 +25,14 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
     }).format(price);
   };
 
-  if (!isOpen) return null;
+  if (!isWishlistOpen) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
+        onClick={() => setIsWishlistOpen(false)}
       />
       
       {/* Sidebar */}
@@ -37,7 +43,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
             Wishlist
           </h2>
           <button 
-            onClick={onClose}
+            onClick={() => setIsWishlistOpen(false)}
             className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
           >
             <X className="w-6 h-6" />
@@ -45,7 +51,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {items.length === 0 ? (
+          {wishlistProducts.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-stone-500 dark:text-stone-400 space-y-4">
               <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
                 <Heart className="w-10 h-10 text-stone-300 dark:text-stone-600" />
@@ -53,7 +59,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
               <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Wishlist kosong</p>
               <p className="text-sm text-center">Simpan produk favorit Anda di sini untuk dibeli nanti.</p>
               <button 
-                onClick={onClose}
+                onClick={() => setIsWishlistOpen(false)}
                 className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
               >
                 Jelajahi Menu
@@ -62,7 +68,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
           ) : (
             <ul className="space-y-6">
               <AnimatePresence>
-                {items.map((item) => (
+                {wishlistProducts.map((item) => (
                   <motion.li 
                     key={item.id}
                     layout
@@ -79,7 +85,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
                         <div className="flex justify-between items-start">
                           <h3 className="font-medium text-stone-900 dark:text-stone-100 line-clamp-1">{item.name}</h3>
                           <button 
-                            onClick={() => onRemove(item.id)}
+                            onClick={() => toggleWishlist(item)}
                             className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
                           >
                             <X className="w-4 h-4" />
@@ -89,7 +95,7 @@ export function Wishlist({ isOpen, onClose, items, onRemove, onAddToCart }: Wish
                       </div>
                       <div className="flex items-center gap-3 mt-2">
                         <button 
-                          onClick={() => onAddToCart(item)}
+                          onClick={() => addToCart(item)}
                           className="flex-1 flex items-center justify-center gap-2 bg-stone-100 dark:bg-stone-800 hover:bg-primary dark:hover:bg-primary text-stone-700 dark:text-stone-300 hover:text-white dark:hover:text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"
                         >
                           <ShoppingBag className="w-4 h-4" />

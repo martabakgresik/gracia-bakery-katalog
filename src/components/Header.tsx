@@ -1,17 +1,20 @@
 import { useState } from 'react';
-import { ShoppingBag, Phone, Menu, Search, X, Heart, History } from 'lucide-react';
+import { ShoppingBag, Phone, Menu, Heart, History, X } from 'lucide-react';
 import { ThemeToggle } from './ThemeToggle';
+import { useStore } from '../store/useStore';
 
-interface HeaderProps {
-  cartItemCount: number;
-  onOpenCart: () => void;
-  wishlistCount: number;
-  onOpenWishlist: () => void;
-  onOpenHistory: () => void;
-}
-
-export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlist, onOpenHistory }: HeaderProps) {
+export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const { 
+    cartItems, 
+    wishlistIds, 
+    setIsCartOpen, 
+    setIsWishlistOpen, 
+    setIsHistoryOpen 
+  } = useStore();
+
+  const cartItemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const wishlistCount = wishlistIds.length;
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#FDFBF7]/90 dark:bg-stone-900/90 backdrop-blur-md border-b border-stone-200 dark:border-stone-800 transition-colors duration-300">
@@ -54,7 +57,7 @@ export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlis
             </div>
 
             <button 
-              onClick={onOpenWishlist}
+              onClick={() => setIsWishlistOpen(true)}
               className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Wishlist"
             >
@@ -67,7 +70,7 @@ export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlis
             </button>
 
             <button 
-              onClick={onOpenHistory}
+              onClick={() => setIsHistoryOpen(true)}
               className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Riwayat Pesanan"
             >
@@ -75,7 +78,7 @@ export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlis
             </button>
 
             <button 
-              onClick={onOpenCart}
+              onClick={() => setIsCartOpen(true)}
               className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
               aria-label="Keranjang Belanja"
             >
@@ -88,8 +91,6 @@ export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlis
             </button>
           </div>
         </div>
-
-        {/* Mobile Search - Removed as it's now in Hero */}
 
         {/* Mobile Menu Dropdown */}
         {isMobileMenuOpen && (
@@ -118,7 +119,7 @@ export function Header({ cartItemCount, onOpenCart, wishlistCount, onOpenWishlis
             <button 
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                onOpenHistory();
+                setIsHistoryOpen(true);
               }} 
               className="flex items-center px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors w-full text-left"
             >

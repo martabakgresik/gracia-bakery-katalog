@@ -1,35 +1,26 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { X, Minus, Plus, MessageCircle, Tag, Ticket } from 'lucide-react';
-import { CartItem, PromoCode } from '../types';
 import { motion, AnimatePresence } from 'motion/react';
+import { toast } from 'sonner';
+import { useStore } from '../store/useStore';
 
-interface CartProps {
-  isOpen: boolean;
-  onClose: () => void;
-  items: CartItem[];
-  onUpdateQuantity: (cartItemId: string, delta: number) => void;
-  onRemove: (cartItemId: string) => void;
-  onCheckout: () => void;
-  appliedPromo: PromoCode | null;
-  onApplyPromo: (code: string) => boolean;
-  onRemovePromo: () => void;
-}
-
-export function Cart({ 
-  isOpen, 
-  onClose, 
-  items, 
-  onUpdateQuantity, 
-  onRemove, 
-  onCheckout,
-  appliedPromo,
-  onApplyPromo,
-  onRemovePromo
-}: CartProps) {
+export function Cart() {
   const [promoInput, setPromoInput] = useState('');
-  const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const discountAmount = appliedPromo ? (subtotal * appliedPromo.discountPercent) / 100 : 0;
-  const total = subtotal - discountAmount;
+  const { 
+    cartItems, 
+    appliedPromo, 
+    isCartOpen, 
+    setIsCartOpen, 
+    updateCartQuantity, 
+    removeFromCart, 
+    applyPromo, 
+    removePromo,
+    checkout 
+  } = useStore();
+
+  const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0), [cartItems]);
+  const discountAmount = useMemo(() => appliedPromo ? (subtotal * appliedPromo.discountPercent) / 100 : 0, [subtotal, appliedPromo]);
+  const total = useMemo(() => subtotal - discountAmount, [subtotal, discountAmount]);
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat('id-ID', {
@@ -40,12 +31,12 @@ export function Cart({
   };
 
   const handleCheckout = () => {
-    if (items.length === 0) return;
+    if (cartItems.length === 0) return;
 
     const phoneNumber = '6282233309744';
     
     let message = 'Halo Gracia Bakery, saya ingin memesan:\n\n';
-    items.forEach(item => {
+    cartItems.forEach(item => {
       const variantName = typeof item.selectedVariant === 'string' 
         ? item.selectedVariant 
         : item.selectedVariant?.name;
@@ -63,25 +54,24 @@ export function Cart({
 
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
-    onCheckout();
   };
 
   const handleApplyPromo = (e: React.FormEvent) => {
     e.preventDefault();
     if (!promoInput.trim()) return;
-    if (onApplyPromo(promoInput)) {
+    if (applyPromo(promoInput)) {
       setPromoInput('');
     }
   };
 
-  if (!isOpen) return null;
+  if (!isCartOpen) return null;
 
   return (
     <>
       {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-50 transition-opacity"
-        onClick={onClose}
+        onClick={() => setIsCartOpen(false)}
       />
       
       {/* Sidebar */}
@@ -89,7 +79,7 @@ export function Cart({
         <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
           <h2 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">Pesanan Saya</h2>
           <button 
-            onClick={onClose}
+            onClick={() => setIsCartOpen(false)}
             className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
           >
             <X className="w-6 h-6" />
@@ -97,7 +87,7 @@ export function Cart({
         </div>
 
         <div className="flex-1 overflow-y-auto p-6">
-          {items.length === 0 ? (
+          {cartItems.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-stone-500 dark:text-stone-400 space-y-4">
               <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
                 <MessageCircle className="w-10 h-10 text-stone-300 dark:text-stone-600" />
@@ -105,7 +95,7 @@ export function Cart({
               <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Keranjang masih kosong</p>
               <p className="text-sm text-center">Silakan pilih aneka roti dan kue kering kami terlebih dahulu.</p>
               <button 
-                onClick={onClose}
+                onClick={() => setIsCartOpen(false)}
                 className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
               >
                 Mulai Belanja
@@ -114,7 +104,7 @@ export function Cart({
           ) : (
             <ul className="space-y-6">
               <AnimatePresence>
-                {items.map((item) => (
+                {cartItems.map((item) => (
                   <motion.li 
                     key={item.cartItemId}
                     layout
@@ -131,7 +121,7 @@ export function Cart({
                         <div className="flex justify-between items-start">
                           <h3 className="font-medium text-stone-900 dark:text-stone-100 line-clamp-1">{item.name}</h3>
                           <button 
-                            onClick={() => onRemove(item.cartItemId)}
+                            onClick={() => removeFromCart(item.cartItemId)}
                             className="text-stone-400 hover:text-red-500 transition-colors"
                           >
                             <X className="w-4 h-4" />
@@ -146,7 +136,7 @@ export function Cart({
                       </div>
                       <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full mt-2 w-fit border border-stone-200 dark:border-stone-700 shadow-sm">
                         <button 
-                          onClick={() => onUpdateQuantity(item.cartItemId, -1)}
+                          onClick={() => updateCartQuantity(item.cartItemId, -1)}
                           className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-l-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
                           aria-label="Kurangi jumlah"
                         >
@@ -154,7 +144,7 @@ export function Cart({
                         </button>
                         <span className="text-sm font-bold w-8 text-center text-stone-900 dark:text-stone-100 select-none">{item.quantity}</span>
                         <button 
-                          onClick={() => onUpdateQuantity(item.cartItemId, 1)}
+                          onClick={() => updateCartQuantity(item.cartItemId, 1)}
                           className="w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-r-full transition-all active:scale-90 active:bg-stone-300 dark:active:bg-stone-600"
                           aria-label="Tambah jumlah"
                         >
@@ -169,7 +159,7 @@ export function Cart({
           )}
         </div>
 
-        {items.length > 0 && (
+        {cartItems.length > 0 && (
           <div className="border-t border-stone-100 dark:border-stone-800 p-6 bg-stone-50 dark:bg-stone-900/50">
             {/* Promo Code Section */}
             <div className="mb-6">
@@ -183,7 +173,7 @@ export function Cart({
                     </div>
                   </div>
                   <button 
-                    onClick={onRemovePromo}
+                    onClick={removePromo}
                     className="text-primary hover:text-primary-dark p-1"
                   >
                     <X className="w-4 h-4" />
@@ -227,8 +217,19 @@ export function Cart({
                 <span className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">{formatPrice(total)}</span>
               </div>
             </div>
+            {/* 
+              Note: handleCheckoutSuccess was in App.tsx. 
+              Ideally we'd want to call the same success logic after WA redirect.
+              Since this is a simple catalog with WA checkout, we trigger the redirect here.
+            */}
             <button
-              onClick={handleCheckout}
+              onClick={() => {
+                handleCheckout();
+                checkout(total, discountAmount);
+                toast.success('Pesanan Berhasil', { 
+                  description: 'Pesanan Anda telah dicatat di riwayat pesanan.' 
+                });
+              }}
               className="w-full flex items-center justify-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white py-4 px-6 rounded-xl font-medium transition-colors duration-200 shadow-sm"
             >
               <MessageCircle className="w-5 h-5" />
