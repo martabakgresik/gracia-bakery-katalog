@@ -1,8 +1,30 @@
+// Simple in-memory storage for rate limiting (per serverless instance)
+const rateLimitMap = new Map<string, { count: number, lastRequest: number }>();
+
 export default async function handler(request: any, response: any) {
   // Only allow POST requests
   if (request.method !== 'POST') {
     return response.status(405).json({ error: 'Method Not Allowed' });
   }
+
+  // Basic Rate Limiting (Simulated)
+  const ip = request.headers['x-forwarded-for'] || 'random-ip';
+  const now = Date.now();
+  const limit = 20; // 20 requests per minute
+  const windowMs = 60 * 1000;
+
+  const current = rateLimitMap.get(ip as string) || { count: 0, lastRequest: now };
+  if (now - current.lastRequest > windowMs) {
+    current.count = 0;
+    current.lastRequest = now;
+  }
+
+  if (current.count >= limit) {
+    return response.status(429).json({ error: 'Terlalu banyak permintaan. Silakan coba lagi sebentar lagi.' });
+  }
+  
+  current.count++;
+  rateLimitMap.set(ip as string, current);
 
   const { messages, model, seed } = request.body;
   const apiKey = process.env.POLLINATIONS_API_KEY;

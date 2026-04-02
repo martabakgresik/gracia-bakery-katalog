@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { X, Heart, ShoppingBag } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatPrice } from '../utils/format';
 import { useStore } from '../store/useStore';
 
 export function Wishlist() {
@@ -16,14 +17,6 @@ export function Wishlist() {
   const wishlistProducts = useMemo(() => {
     return productList.filter(p => wishlistIds.includes(p.id));
   }, [productList, wishlistIds]);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
 
   if (!isWishlistOpen) return null;
 
