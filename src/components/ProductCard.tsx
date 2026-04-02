@@ -1,6 +1,7 @@
 import { Plus, Star, StarHalf, Share2, Heart } from 'lucide-react';
 import { Product } from '../types';
 import { shareProduct } from '../utils/share';
+import { formatPrice } from '../utils/format';
 import { useStore } from '../store/useStore';
 
 interface ProductCardProps {
@@ -10,14 +11,6 @@ interface ProductCardProps {
 export function ProductCard({ product }: ProductCardProps) {
   const { wishlistIds, toggleWishlist, addToCart, setSelectedProductId } = useStore();
   const isWishlisted = wishlistIds.includes(product.id);
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();

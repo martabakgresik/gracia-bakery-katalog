@@ -1,17 +1,10 @@
 import { X, History, Package, Clock } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
+import { formatPrice } from '../utils/format';
 import { useStore } from '../store/useStore';
 
 export function OrderHistory() {
   const { orders, isHistoryOpen, setIsHistoryOpen } = useStore();
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('id-ID', {

@@ -4,6 +4,7 @@ import path from "path";
 import fs from "fs";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
+import { rateLimit } from 'express-rate-limit';
 
 dotenv.config();
 
@@ -16,8 +17,16 @@ async function startServer() {
 
   app.use(express.json());
 
+  const aiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // Limit each IP to 100 requests per windowMs
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Terlalu banyak permintaan AI. Silakan coba lagi nanti.' }
+  });
+
   // API Proxy Route for Pollinations AI
-  app.post("/api/chat", async (req, res) => {
+  app.post("/api/chat", aiLimiter, async (req, res) => {
     const { messages, model, seed } = req.body;
     const apiKey = process.env.POLLINATIONS_API_KEY;
 

@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from 'react';
-import { X, Send, Loader2, Maximize2, Minimize2, Phone, MessageSquare, Store, Trash2 } from 'lucide-react';
+import { Store } from 'lucide-react';
 import { products } from '../data/products';
 import { APP_CONFIG } from '../data/config';
-import { faqs } from './FAQ';
 import { motion, AnimatePresence } from 'motion/react';
-import ReactMarkdown from 'react-markdown';
+import { ChatHeader } from './AIChat/ChatHeader';
+import { MessageList } from './AIChat/MessageList';
+import { ChatInput } from './AIChat/ChatInput';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -43,7 +44,7 @@ export function AIChat() {
   }, [input]);
 
   useEffect(() => {
-    let interval: NodeJS.Timeout;
+    let interval: any;
     if (isLoading) {
       setLoadingTime(0);
       interval = setInterval(() => {
@@ -107,7 +108,6 @@ export function AIChat() {
         { role: 'user', content: userText }
       ];
 
-      // Using local API proxy for security
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: {
@@ -175,150 +175,28 @@ export function AIChat() {
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 bg-white dark:bg-stone-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-300 ease-in-out"
           >
-            {/* Header */}
-            <div className="bg-primary p-4 flex justify-between items-center text-white shrink-0">
-              <div className="flex items-center gap-3 flex-1 min-w-0">
-                <div className="relative shrink-0 w-10 h-10 bg-white/20 rounded-full flex items-center justify-center border-2 border-white/20">
-                  <Store className="w-6 h-6 text-white" />
-                  <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-primary rounded-full"></span>
-                </div>
-                <div className="flex flex-col min-w-0">
-                  <h3 className="font-semibold leading-tight truncate">Gracia Asisten</h3>
-                  <div className="flex items-center gap-1.5">
-                    {isLoading ? (
-                      <span className="text-[10px] text-white/80 flex items-center gap-1">
-                        <span className="flex gap-0.5">
-                          <span className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.3s]"></span>
-                          <span className="w-1 h-1 bg-white rounded-full animate-bounce [animation-delay:-0.15s]"></span>
-                          <span className="w-1 h-1 bg-white rounded-full animate-bounce"></span>
-                        </span>
-                        Sedang mengetik...
-                      </span>
-                    ) : (
-                      <span className="text-[10px] text-white/80">Online</span>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2 ml-2 shrink-0">
-                <button
-                  onClick={handleClearChat}
-                  className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
-                  title="Hapus Percakapan"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={() => setIsMaximized(!isMaximized)}
-                  className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded"
-                  title={isMaximized ? "Kecilkan" : "Besarkan"}
-                >
-                  {isMaximized ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
-                </button>
-                <button onClick={() => setIsOpen(false)} className="text-white/80 hover:text-white transition-colors p-1 hover:bg-white/10 rounded">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
+            <ChatHeader 
+              isLoading={isLoading}
+              isMaximized={isMaximized}
+              setIsMaximized={setIsMaximized}
+              onClear={handleClearChat}
+              onClose={() => setIsOpen(false)}
+            />
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-stone-50 dark:bg-stone-900/50">
-              {messages.map((msg, idx) => (
-                <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div className={`max-w-[85%] rounded-2xl px-4 py-2 ${msg.role === 'user'
-                      ? 'bg-primary text-white rounded-tr-sm'
-                      : 'bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 text-stone-800 dark:text-stone-200 rounded-tl-sm shadow-sm'
-                    }`}>
-                    {msg.role === 'assistant' ? (
-                      <div className="prose prose-sm prose-stone dark:prose-invert max-w-none [&_p]:mb-4 last:[&_p]:mb-0 leading-relaxed">
-                        <ReactMarkdown
-                          components={{
-                            a: ({ node, ...props }) => {
-                              const isWhatsApp = props.href?.includes('wa.me');
-                              const isTel = props.href?.startsWith('tel:');
+            <MessageList 
+              messages={messages}
+              isLoading={isLoading}
+              loadingTime={loadingTime}
+              messagesEndRef={messagesEndRef}
+            />
 
-                              if (isWhatsApp) {
-                                return (
-                                  <a
-                                    {...props}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="inline-flex items-center gap-2 bg-[#25D366] hover:bg-[#128C7E] text-white px-4 py-2 rounded-xl font-medium no-underline my-2 transition-colors shadow-sm"
-                                  >
-                                    <MessageSquare className="w-4 h-4" />
-                                    WhatsApp Kami
-                                  </a>
-                                );
-                              }
-
-                              if (isTel) {
-                                return (
-                                  <a
-                                    {...props}
-                                    className="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-xl font-medium no-underline my-2 transition-colors shadow-sm"
-                                  >
-                                    <Phone className="w-4 h-4" />
-                                    Hubungi Telepon
-                                  </a>
-                                );
-                              }
-
-                              return <a {...props} className="text-primary hover:underline" target="_blank" rel="noopener noreferrer" />;
-                            }
-                          }}
-                        >
-                          {msg.text}
-                        </ReactMarkdown>
-                      </div>
-                    ) : (
-                      <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
-                    )}
-                  </div>
-                </div>
-              ))}
-              {isLoading && (
-                <div className="flex justify-start">
-                  <div className="bg-white dark:bg-stone-800 border border-stone-200 dark:border-stone-700 rounded-2xl rounded-tl-sm px-4 py-3 shadow-sm flex flex-col gap-1">
-                    <div className="flex items-center gap-2 text-primary dark:text-primary-light">
-                      <Loader2 className="w-4 h-4 animate-spin" />
-                      <span className="text-xs font-medium animate-pulse">Gracia sedang berpikir...</span>
-                    </div>
-                    <span className="text-[10px] text-stone-400 dark:text-stone-500 ml-6">
-                      Waktu tunggu: {loadingTime} detik
-                    </span>
-                  </div>
-                </div>
-              )}
-              <div ref={messagesEndRef} />
-            </div>
-
-            {/* Input */}
-            <div className="p-3 bg-white dark:bg-stone-900 border-t border-stone-100 dark:border-stone-800">
-              <div className="flex items-end gap-2">
-                <textarea
-                  ref={textareaRef}
-                  rows={1}
-                  value={input}
-                  onChange={(e) => setInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                      e.preventDefault();
-                      handleSend();
-                    }
-                  }}
-                  placeholder="Ketik pesan..."
-                  className="flex-1 bg-stone-100 dark:bg-stone-800 border-transparent focus:bg-white dark:focus:bg-stone-900 focus:border-primary dark:focus:border-primary-light focus:ring-1 focus:ring-primary dark:focus:ring-primary-light rounded-2xl px-4 py-2.5 text-sm transition-all text-stone-900 dark:text-stone-100 placeholder-stone-500 dark:placeholder-stone-400 resize-none max-h-[150px] overflow-y-auto scrollbar-thin"
-                  disabled={isLoading}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={!input.trim() || isLoading}
-                  className="p-2.5 bg-primary text-white rounded-full hover:bg-primary-light transition-colors disabled:opacity-50 disabled:cursor-not-allowed mb-[2px]"
-                >
-                  <Send className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
+            <ChatInput 
+              input={input}
+              setInput={setInput}
+              isLoading={isLoading}
+              onSend={handleSend}
+              textareaRef={textareaRef}
+            />
           </motion.div>
         )}
       </AnimatePresence>

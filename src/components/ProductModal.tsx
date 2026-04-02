@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, ShoppingBag, Star, StarHalf, Share2, Heart } from 'lucide-react';
 import { Product, ProductVariant } from '../types';
 import { shareProduct } from '../utils/share';
+import { formatPrice } from '../utils/format';
 import { useStore } from '../store/useStore';
 
 export function ProductModal() {
@@ -34,7 +35,46 @@ export function ProductModal() {
     } else {
       setSelectedVariant('');
     }
-  }, [product?.id]);
+
+    // JSON-LD Schema Injection
+    if (product && isOpen) {
+      const schema = {
+        "@context": "https://schema.org/",
+        "@type": "Product",
+        "name": product.name,
+        "image": product.image,
+        "description": product.description,
+        "brand": {
+          "@type": "Brand",
+          "name": "Gracia Bakery"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": window.location.href,
+          "priceCurrency": "IDR",
+          "price": product.price,
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": product.rating,
+          "reviewCount": product.reviewCount
+        }
+      };
+
+      const script = document.createElement('script');
+      script.type = 'application/ld+json';
+      script.id = 'product-json-ld';
+      script.text = JSON.stringify(schema);
+      document.head.appendChild(script);
+
+      return () => {
+        const oldScript = document.getElementById('product-json-ld');
+        if (oldScript) document.head.removeChild(oldScript);
+      };
+    }
+  }, [product?.id, isOpen]);
 
   if (!isOpen || !product) return null;
 
@@ -49,14 +89,6 @@ export function ProductModal() {
   };
 
   const currentPrice = selectedVariant ? getVariantPrice(selectedVariant) : product.price;
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0
-    }).format(price);
-  };
 
   const handleAddToCart = () => {
     addToCart(product, selectedVariant || undefined);

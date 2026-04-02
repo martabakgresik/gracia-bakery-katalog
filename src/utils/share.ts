@@ -1,16 +1,13 @@
+import { formatPrice } from './format';
 import { Product } from '../types';
 
 export const shareProduct = async (product: Product) => {
   // Use the current origin as the base URL
   const url = window.location.origin;
   
-  const formatPrice = new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0
-  }).format(product.price);
+  const formattedPrice = formatPrice(product.price);
 
-  const text = `Coba lihat ${product.name} dari Gracia Bakery!\n\n${product.description}\n\nHarga: ${formatPrice}\n\nPesan sekarang di: ${url}`;
+  const text = `Coba lihat ${product.name} dari Gracia Bakery!\n\n${product.description}\n\nHarga: ${formattedPrice}\n\nPesan sekarang di: ${url}`;
   
   if (navigator.share) {
     try {
