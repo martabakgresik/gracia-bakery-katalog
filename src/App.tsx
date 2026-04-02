@@ -58,10 +58,13 @@ export default function App() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col font-sans bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 transition-colors duration-300">
+    <div className="min-h-screen flex flex-col font-sans bg-stone-50 dark:bg-stone-900 text-stone-900 dark:text-stone-100 transition-colors duration-300 overflow-x-hidden">
       <Toaster position="top-center" />
-      <PromoBanner />
-      <Header />
+      <div className="fixed top-0 left-0 right-0 z-[100]">
+        <PromoBanner />
+        <Header />
+      </div>
+      <div className="h-24 lg:h-32 mb-4"></div> {/* Spacer for fixed wrapper */}
       
       <main className="flex-grow">
         <Hero />
