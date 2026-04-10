@@ -4,6 +4,7 @@ import { ThemeToggle } from './ThemeToggle';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
 import { CartItem } from '../types';
+import { APP_CONFIG } from '../data/config';
 
 export function Header() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -113,32 +114,20 @@ export function Header() {
           </nav>
 
           {/* Desktop Contact & Cart */}
-          <div className="flex items-center space-x-2 md:space-x-4">
-            <div className={`hidden sm:flex items-center text-stone-600 dark:text-stone-300 mr-2 transition-all duration-300 ${isSlim ? 'opacity-0 scale-95 pointer-events-none w-0 overflow-hidden' : 'opacity-100'}`}>
+          <div className="flex items-center space-x-1 md:space-x-4">
+            <a 
+              href={APP_CONFIG.shopInfo.whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`hidden sm:flex items-center text-stone-600 dark:text-stone-300 mr-2 transition-all duration-300 hover:text-primary dark:hover:text-primary-light ${isSlim ? 'opacity-0 scale-95 pointer-events-none w-0 overflow-hidden' : 'opacity-100'}`}
+            >
               <Phone className="h-4 w-4 mr-2" />
               <span className="text-sm font-medium whitespace-nowrap">+62 822-3330-9744</span>
-            </div>
+            </a>
             
-            <div className="hidden sm:block">
+            <div className="flex items-center">
               <ThemeToggle />
             </div>
-
-            <button 
-              onClick={() => setIsWishlistOpen(true)}
-              className="relative p-2 text-stone-600 hover:text-primary dark:text-stone-300 dark:hover:text-primary-light transition-colors"
-              aria-label="Wishlist"
-            >
-              <Heart className="h-6 w-6" />
-              {wishlistCount > 0 && (
-                <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-500 rounded-full"
-                >
-                  {wishlistCount}
-                </motion.span>
-              )}
-            </button>
 
             <button 
               onClick={() => setIsHistoryOpen(true)}
@@ -214,14 +203,16 @@ export function Header() {
                 <History className="h-4 w-4 mr-2" />
                 Riwayat Pesanan
               </button>
-              <div className="flex items-center px-2 text-stone-600 dark:text-stone-300">
+              <a 
+                href={APP_CONFIG.shopInfo.whatsappUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              >
                 <Phone className="h-4 w-4 mr-2" />
                 <span className="text-sm font-medium">+62 822-3330-9744</span>
-              </div>
-              <div className="flex items-center justify-between px-2 pt-2 border-t border-stone-100 dark:border-stone-800">
-                <span className="text-stone-600 dark:text-stone-300 font-medium">Tema Tampilan</span>
-                <ThemeToggle />
-              </div>
+              </a>
             </motion.div>
           )}
         </AnimatePresence>

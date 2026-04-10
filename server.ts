@@ -5,6 +5,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import dotenv from "dotenv";
 import { rateLimit } from 'express-rate-limit';
+import helmet from 'helmet';
 
 dotenv.config();
 
@@ -15,6 +16,15 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Trust proxy is required for express-rate-limit to work correctly behind a load balancer/proxy
+  app.set('trust proxy', 1);
+
+  // Use helmet for security headers, but disable some features that might interfere with Vite in dev
+  app.use(helmet({
+    contentSecurityPolicy: false, // Disabled to allow Vite's inline scripts and styles
+    crossOriginEmbedderPolicy: false,
+  }));
+
   app.use(express.json());
 
   const aiLimiter = rateLimit({
@@ -22,6 +32,7 @@ async function startServer() {
     max: 100, // Limit each IP to 100 requests per windowMs
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { trustProxy: false },
     message: { error: 'Terlalu banyak permintaan AI. Silakan coba lagi nanti.' }
   });
 
@@ -33,6 +44,33 @@ async function startServer() {
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: "Invalid messages array provided" });
     }
+
+    // Basic input validation
+    if (messages.length > 50) {
+      return res.status(400).json({ error: "Conversation too long" });
+    }
+
+    const systemInstruction = `Anda adalah "Gracia Asisten", asisten virtual resmi untuk website Gracia Bakery.
+      Toko ini menjual roti, jajanan pasar, kue kering, dan donat.
+      Nomor WhatsApp toko: +62 822-3330-9744.
+      
+      Tentang Gracia Bakery:
+      Berdiri sejak tahun 2010, Gracia Bakery bermula dari kecintaan terhadap resep kue tradisional warisan keluarga. Kami berkomitmen menggunakan bahan-bahan premium berkualitas tinggi tanpa bahan pengawet buatan. Semua dibuat fresh setiap hari.
+      
+      Tugas Anda:
+      1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
+      2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya.
+      3. Jawab pertanyaan dengan singkat, padat, namun persuasif. 
+      4. Gunakan bahasa Indonesia yang santai namun tetap sopan.
+      5. Gunakan Markdown untuk format teks (tebal, miring).
+      6. Jika pelanggan ingin memesan, arahkan ke WhatsApp: [Hubungi WhatsApp](https://wa.me/6282233309744)`;
+
+    // Filter out any existing system messages from the client and prepend our own
+    const filteredMessages = messages.filter(m => m.role !== 'system');
+    const apiMessages = [
+      { role: 'system', content: systemInstruction },
+      ...filteredMessages
+    ];
 
     try {
       const response = await fetch('https://gen.pollinations.ai/v1/chat/completions', {

@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { X, Minus, Plus, MessageCircle, Tag, Ticket } from 'lucide-react';
+import { X, Minus, Plus, MessageCircle, Tag, Ticket, Heart, ShoppingBag as ShoppingBagIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { toast } from 'sonner';
 import { formatPrice } from '../utils/format';
@@ -8,6 +8,8 @@ import { useStore } from '../store/useStore';
 export function Cart() {
   const [promoInput, setPromoInput] = useState('');
   const [cartStep, setCartStep] = useState<'cart' | 'review'>('cart');
+  const [activeTab, setActiveTab] = useState<'cart' | 'wishlist'>('cart');
+  
   const { 
     cartItems, 
     appliedPromo, 
@@ -17,8 +19,16 @@ export function Cart() {
     removeFromCart, 
     applyPromo, 
     removePromo,
-    checkout 
+    checkout,
+    productList,
+    wishlistIds,
+    toggleWishlist,
+    addToCart
   } = useStore();
+
+  const wishlistProducts = useMemo(() => {
+    return productList.filter(p => wishlistIds.includes(p.id));
+  }, [productList, wishlistIds]);
 
   const subtotal = useMemo(() => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0), [cartItems]);
   const discountAmount = useMemo(() => appliedPromo ? (subtotal * appliedPromo.discountPercent) / 100 : 0, [subtotal, appliedPromo]);
@@ -77,109 +87,206 @@ export function Cart() {
     <>
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-50 transition-opacity"
+        className="fixed inset-0 bg-stone-900/50 backdrop-blur-sm z-[140] transition-opacity"
         onClick={() => setIsCartOpen(false)}
       />
       
       {/* Sidebar */}
-      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-stone-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-stone-200 dark:border-stone-800">
-        <div className="flex items-center justify-between px-6 py-4 border-b border-stone-100 dark:border-stone-800">
-          <div className="flex items-center gap-3">
-            {cartStep === 'review' && (
-              <button 
-                onClick={() => setCartStep('cart')}
-                className="p-1 -ml-1 text-stone-400 hover:text-primary transition-colors"
-                aria-label="Kembali ke keranjang"
-              >
-                <Minus className="w-5 h-5 rotate-90" />
-              </button>
-            )}
-            <h2 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">
-              {cartStep === 'cart' ? 'Pesanan Saya' : 'Review Pesanan'}
-            </h2>
+      <div className="fixed inset-y-0 right-0 z-[150] w-full max-w-md bg-white dark:bg-stone-900 shadow-2xl flex flex-col transform transition-transform duration-300 ease-in-out border-l border-stone-200 dark:border-stone-800">
+        <div className="flex flex-col border-b border-stone-100 dark:border-stone-800">
+          <div className="flex items-center justify-between px-6 py-4">
+            <div className="flex items-center gap-3">
+              {cartStep === 'review' && (
+                <button 
+                  onClick={() => setCartStep('cart')}
+                  className="p-1 -ml-1 text-stone-400 hover:text-primary transition-colors"
+                  aria-label="Kembali ke keranjang"
+                >
+                  <Minus className="w-5 h-5 rotate-90" />
+                </button>
+              )}
+              <h2 className="text-2xl font-serif font-bold text-stone-900 dark:text-stone-100">
+                {cartStep === 'cart' ? (activeTab === 'cart' ? 'Pesanan Saya' : 'Koleksi Favorit') : 'Review Pesanan'}
+              </h2>
+            </div>
+            <button 
+              onClick={() => setIsCartOpen(false)}
+              className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
-          <button 
-            onClick={() => setIsCartOpen(false)}
-            className="p-2 text-stone-400 dark:text-stone-500 hover:text-stone-600 dark:hover:text-stone-300 transition-colors rounded-full hover:bg-stone-100 dark:hover:bg-stone-800"
-          >
-            <X className="w-6 h-6" />
-          </button>
-        </div>
 
-        <div className="flex-1 overflow-y-auto p-6">
-          {cartItems.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-stone-500 dark:text-stone-400 space-y-4">
-              <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
-                <MessageCircle className="w-10 h-10 text-stone-300 dark:text-stone-600" />
-              </div>
-              <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Keranjang masih kosong</p>
-              <p className="text-sm text-center">Silakan pilih aneka roti dan kue kering kami terlebih dahulu.</p>
-              <button 
-                onClick={() => setIsCartOpen(false)}
-                className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
+          {cartStep === 'cart' && (
+            <div className="flex px-6 pb-2 gap-6">
+              <button
+                onClick={() => setActiveTab('cart')}
+                className={`pb-2 text-sm font-bold transition-all relative ${
+                  activeTab === 'cart' 
+                    ? 'text-primary' 
+                    : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'
+                }`}
               >
-                Mulai Belanja
+                Keranjang ({cartItems.length})
+                {activeTab === 'cart' && (
+                  <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
+              </button>
+              <button
+                onClick={() => setActiveTab('wishlist')}
+                className={`pb-2 text-sm font-bold transition-all relative ${
+                  activeTab === 'wishlist' 
+                    ? 'text-primary' 
+                    : 'text-stone-400 hover:text-stone-600 dark:hover:text-stone-300'
+                }`}
+              >
+                Favorit ({wishlistIds.length})
+                {activeTab === 'wishlist' && (
+                  <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />
+                )}
               </button>
             </div>
-          ) : (
-            <ul className="space-y-6">
-              <AnimatePresence>
-                {cartItems.map((item) => (
-                  <motion.li 
-                    key={item.cartItemId}
-                    layout
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    className="flex gap-4"
-                  >
-                    <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 flex-shrink-0">
-                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
-                    </div>
-                    <div className="flex flex-col flex-1 justify-between">
-                      <div>
-                        <div className="flex justify-between items-start">
-                          <h3 className="font-medium text-stone-900 dark:text-stone-100 line-clamp-1">{item.name}</h3>
-                          <button 
-                            onClick={() => removeFromCart(item.cartItemId)}
-                            className={`text-stone-400 hover:text-red-500 transition-colors ${cartStep === 'review' ? 'hidden' : ''}`}
-                          >
-                            <X className="w-4 h-4" />
-                          </button>
-                        </div>
-                        {item.selectedVariant && (
-                          <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
-                            {typeof item.selectedVariant === 'string' ? item.selectedVariant : item.selectedVariant.name}
-                          </p>
-                        )}
-                        <p className="text-primary dark:text-primary-light font-medium text-sm mt-1">{formatPrice(item.price)}</p>
-                      </div>
-                      <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full mt-2 w-fit border border-stone-200 dark:border-stone-700 shadow-sm">
-                        <button 
-                          onClick={() => updateCartQuantity(item.cartItemId, -1)}
-                          className={`w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-l-full transition-all active:scale-90 ${cartStep === 'review' ? 'hidden' : ''}`}
-                          aria-label="Kurangi jumlah"
-                        >
-                          <Minus className="w-4 h-4" />
-                        </button>
-                        <span className={`text-sm font-bold w-8 text-center text-stone-900 dark:text-stone-100 select-none ${cartStep === 'review' ? 'px-3 w-auto' : ''}`}>{item.quantity}</span>
-                        <button 
-                          onClick={() => updateCartQuantity(item.cartItemId, 1)}
-                          className={`w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-r-full transition-all active:scale-90 ${cartStep === 'review' ? 'hidden' : ''}`}
-                          aria-label="Tambah jumlah"
-                        >
-                          <Plus className="w-4 h-4" />
-                        </button>
-                      </div>
-                    </div>
-                  </motion.li>
-                ))}
-              </AnimatePresence>
-            </ul>
           )}
         </div>
 
-        {cartItems.length > 0 && (
+        <div className="flex-1 overflow-y-auto p-6">
+          {activeTab === 'cart' || cartStep === 'review' ? (
+            cartItems.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-stone-500 dark:text-stone-400 space-y-4">
+                <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
+                  <MessageCircle className="w-10 h-10 text-stone-300 dark:text-stone-600" />
+                </div>
+                <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Keranjang masih kosong</p>
+                <p className="text-sm text-center">Silakan pilih aneka roti dan kue kering kami terlebih dahulu.</p>
+                <button 
+                  onClick={() => setIsCartOpen(false)}
+                  className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
+                >
+                  Mulai Belanja
+                </button>
+              </div>
+            ) : (
+              <ul className="space-y-6">
+                <AnimatePresence>
+                  {cartItems.map((item) => (
+                    <motion.li 
+                      key={item.cartItemId}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex gap-4"
+                    >
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 flex-shrink-0">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      </div>
+                      <div className="flex flex-col flex-1 justify-between">
+                        <div>
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-medium text-stone-900 dark:text-stone-100 line-clamp-1">{item.name}</h3>
+                            <button 
+                              onClick={() => removeFromCart(item.cartItemId)}
+                              className={`text-stone-400 hover:text-red-500 transition-colors ${cartStep === 'review' ? 'hidden' : ''}`}
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          {item.selectedVariant && (
+                            <p className="text-xs text-stone-500 dark:text-stone-400 mt-0.5">
+                              {typeof item.selectedVariant === 'string' ? item.selectedVariant : item.selectedVariant.name}
+                            </p>
+                          )}
+                          <p className="text-primary dark:text-primary-light font-medium text-sm mt-1">{formatPrice(item.price)}</p>
+                        </div>
+                        <div className="flex items-center bg-stone-100 dark:bg-stone-800 rounded-full mt-2 w-fit border border-stone-200 dark:border-stone-700 shadow-sm">
+                          <button 
+                            onClick={() => updateCartQuantity(item.cartItemId, -1)}
+                            className={`w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-l-full transition-all active:scale-90 ${cartStep === 'review' ? 'hidden' : ''}`}
+                            aria-label="Kurangi jumlah"
+                          >
+                            <Minus className="w-4 h-4" />
+                          </button>
+                          <span className={`text-sm font-bold w-8 text-center text-stone-900 dark:text-stone-100 select-none ${cartStep === 'review' ? 'px-3 w-auto' : ''}`}>{item.quantity}</span>
+                          <button 
+                            onClick={() => updateCartQuantity(item.cartItemId, 1)}
+                            className={`w-9 h-9 flex items-center justify-center text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light hover:bg-stone-200 dark:hover:bg-stone-700 rounded-r-full transition-all active:scale-90 ${cartStep === 'review' ? 'hidden' : ''}`}
+                            aria-label="Tambah jumlah"
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </div>
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </ul>
+            )
+          ) : (
+            // Wishlist Tab Content
+            wishlistProducts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full text-stone-500 dark:text-stone-400 space-y-4">
+                <div className="w-24 h-24 bg-stone-100 dark:bg-stone-800 rounded-full flex items-center justify-center">
+                  <Heart className="w-10 h-10 text-stone-300 dark:text-stone-600" />
+                </div>
+                <p className="text-lg font-medium text-stone-900 dark:text-stone-200">Wishlist kosong</p>
+                <p className="text-sm text-center">Simpan produk favorit Anda di sini untuk dibeli nanti.</p>
+                <button 
+                  onClick={() => setIsCartOpen(false)}
+                  className="mt-4 px-6 py-2 bg-primary text-white rounded-full text-sm font-medium hover:bg-primary-light transition-colors"
+                >
+                  Jelajahi Menu
+                </button>
+              </div>
+            ) : (
+              <ul className="space-y-6">
+                <AnimatePresence>
+                  {wishlistProducts.map((item) => (
+                    <motion.li 
+                      key={item.id}
+                      layout
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.9 }}
+                      className="flex gap-4"
+                    >
+                      <div className="w-20 h-20 rounded-xl overflow-hidden bg-stone-100 dark:bg-stone-800 flex-shrink-0">
+                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                      </div>
+                      <div className="flex flex-col flex-1 justify-between">
+                        <div>
+                          <div className="flex justify-between items-start">
+                            <h3 className="font-medium text-stone-900 dark:text-stone-100 line-clamp-1">{item.name}</h3>
+                            <button 
+                              onClick={() => toggleWishlist(item)}
+                              className="text-stone-400 hover:text-red-500 dark:hover:text-red-400 transition-colors"
+                            >
+                              <X className="w-4 h-4" />
+                            </button>
+                          </div>
+                          <p className="text-primary dark:text-primary-light font-medium text-sm mt-1">{formatPrice(item.price)}</p>
+                        </div>
+                        <div className="flex items-center gap-3 mt-2">
+                          <button 
+                            onClick={() => {
+                              addToCart(item);
+                              setActiveTab('cart');
+                            }}
+                            className="flex-1 flex items-center justify-center gap-2 bg-stone-100 dark:bg-stone-800 hover:bg-primary dark:hover:bg-primary text-stone-700 dark:text-stone-300 hover:text-white dark:hover:text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors duration-200"
+                          >
+                            <ShoppingBagIcon className="w-4 h-4" />
+                            Tambah ke Keranjang
+                          </button>
+                        </div>
+                      </div>
+                    </motion.li>
+                  ))}
+                </AnimatePresence>
+              </ul>
+            )
+          )}
+        </div>
+
+        {activeTab === 'cart' && cartItems.length > 0 && (
           <div className="border-t border-stone-100 dark:border-stone-800 p-6 bg-stone-50 dark:bg-stone-900/50">
             {/* Promo Code Section */}
             {cartStep === 'cart' && (

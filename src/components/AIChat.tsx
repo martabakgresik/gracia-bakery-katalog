@@ -73,37 +73,7 @@ export function AIChat() {
     setIsLoading(true);
 
     try {
-      const productContext = products.map(p => `- ${p.name} (${p.category}): Rp${p.price.toLocaleString('id-ID')}. ${p.description}`).join('\n');
-
-      const systemInstruction = `Anda adalah "Gracia Asisten", asisten virtual resmi untuk website Gracia Bakery.
-      Toko ini menjual roti, jajanan pasar, kue kering, dan donat.
-      Nomor WhatsApp toko: +62 822-3330-9744.
-      Jika pelanggan ingin memesan atau menghubungi via WhatsApp, berikan tautan dalam format: [Hubungi WhatsApp](https://wa.me/6282233309744?text=Halo%20Gracia%20Bakery,%20saya%20ingin%20bertanya%20tentang...)
-      Jika memberikan nomor telepon, gunakan format: [0822-3330-9744](tel:+6282233309744)
-      
-      Tentang Gracia Bakery:
-      Berdiri sejak tahun 2010, Gracia Bakery bermula dari kecintaan terhadap resep kue tradisional warisan keluarga. Kami berkomitmen menggunakan bahan-bahan premium berkualitas tinggi tanpa bahan pengawet buatan. Semua dibuat fresh setiap hari.
-      
-      Daftar produk kami:
-      ${productContext}
-      
-      Informasi Promo Aktif:
-      Saat ini ada promo: "${APP_CONFIG.activePromo.bannerText}". 
-      Kode promo yang bisa digunakan adalah "**${APP_CONFIG.activePromo.code}**" untuk mendapatkan diskon sebesar **${APP_CONFIG.activePromo.discountPercent}%**. 
-      Harap beritahukan info promo ini kepada pelanggan jika mereka bertanya tentang diskon, harga murah, atau cara menghemat belanja.
-
-      Tugas Anda:
-      1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
-      2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya agar percakapan terasa natural.
-      3. Jawab pertanyaan dengan singkat, padat, namun persuasif. 
-      4. Selalu lakukan trik "Upselling" dengan halus. Contoh: Jika Kakak memesan/bertanya tentang Roti Sobek, rekomendasikan juga sekalian Nastar Lumer atau minuman pendampingnya untuk melengkapi pesanan. 
-      5. Gunakan bahasa Indonesia yang santai namun tetap sopan dan profesional.
-      6. Wajib gunakan format Markdown tekstual untuk memikat bacaan: gunakan **tebal** (bold) untuk nama produk, harga, atau highlight penting, gunakan *miring* (italic) untuk penekanan rasa/upselling, dan gunakan ~~coret~~ (strikethrough) jika sedang mempromosikan diskon "harga coret".
-      7. Pisahkan antar alinea/paragraf dengan memberikan **jarak baris baru yang jelas (double newline)** agar mudah dibaca. Jangan biarkan kalimat menumpuk terlalu rapat.
-      8. Gunakan Markdown URL untuk link WhatsApp (opsional namun sangat disarankan jika pelanggan ingin beli).`;
-
       const apiMessages = [
-        { role: 'system', content: systemInstruction },
         ...messages.map(m => ({ role: m.role, content: m.text })),
         { role: 'user', content: userText }
       ];
@@ -146,7 +116,7 @@ export function AIChat() {
   return (
     <>
       {/* Floating Button */}
-      <div className={`fixed bottom-6 right-6 z-40 ${isOpen ? 'hidden' : 'flex'} flex-col items-center gap-1.5`}>
+      <div className={`fixed bottom-6 left-6 z-40 ${isOpen ? 'hidden' : 'flex'} flex-col items-center gap-1.5`}>
         <button
           onClick={() => setIsOpen(true)}
           className="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:bg-primary-light transition-all hover:scale-105 active:scale-95 group"
@@ -173,7 +143,7 @@ export function AIChat() {
               height: isMaximized ? 'min(800px, calc(100vh - 4rem))' : 'min(500px, calc(100vh - 4rem))',
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 bg-white dark:bg-stone-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-300 ease-in-out"
+            className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-[130] bg-white dark:bg-stone-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-300 ease-in-out"
           >
             <ChatHeader 
               isLoading={isLoading}
