@@ -6,7 +6,7 @@ export function About() {
           <div className="relative">
             <div className="absolute -inset-4 bg-stone-100 dark:bg-stone-700 rounded-3xl transform -rotate-3 transition-colors duration-300"></div>
             <img 
-              src="/og-gracia-bakery.webp" 
+              src="og-gracia-bakery.webp" 
               alt="Tentang Gracia Bakery" 
               className="relative rounded-2xl shadow-lg object-cover h-[400px] w-full"
               referrerPolicy="no-referrer"

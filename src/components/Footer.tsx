@@ -29,7 +29,7 @@ export function Footer() {
               </li>
               <li className="flex items-start gap-3">
                 <MapPin className="w-5 h-5 text-primary shrink-0 mt-0.5" />
-                <span>Jl. Roti Manis No. 123<br/>Sidoarjo, Jawa Timur Indonesia, 12345</span>
+                <span>Sidoarjo, Jawa Timur<br/>Indonesia</span>
               </li>
             </ul>
           </div>
