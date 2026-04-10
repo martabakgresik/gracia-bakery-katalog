@@ -1,4 +1,28 @@
 {
+  "redirects": [
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "bakery.my.id"
+        }
+      ],
+      "destination": "https://gracia.bakery.my.id/$1",
+      "permanent": true
+    },
+    {
+      "source": "/(.*)",
+      "has": [
+        {
+          "type": "host",
+          "value": "www.bakery.my.id"
+        }
+      ],
+      "destination": "https://gracia.bakery.my.id/$1",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/api/chat",
