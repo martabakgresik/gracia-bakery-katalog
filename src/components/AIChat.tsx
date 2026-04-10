@@ -73,7 +73,6 @@ export function AIChat() {
     setIsLoading(true);
 
     try {
-feature/zustand-state-management
       const productContext = products.map(p => `- ${p.name} (${p.category}): Rp${p.price.toLocaleString('id-ID')}. ${p.description}`).join('\n');
 
       const systemInstruction = `Anda adalah "Gracia Asisten", representasi digital dan tenaga ahli/sales eksekutif resmi untuk website Gracia Bakery. Tujuan utama Anda adalah memandu pelanggan menjelajahi seluruh layanan dan katalog website kami, memahami kebutuhan mereka, serta melakukan "soft selling" cerdas untuk mendorong pemesanan produk tanpa terlihat memaksa.
@@ -106,8 +105,8 @@ feature/zustand-state-management
       
       Jadilah konsultan Bakery terbaik untuk pelanggan kami, buat mereka merasa dilayani dengan istimewa, dan kemukakan kelebihan website secara halus!`;
 
-
       const apiMessages = [
+        { role: 'system', content: systemInstruction },
         ...messages.map(m => ({ role: m.role, content: m.text })),
         { role: 'user', content: userText }
       ];
