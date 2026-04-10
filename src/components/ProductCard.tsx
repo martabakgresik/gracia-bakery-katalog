@@ -43,8 +43,13 @@ export function ProductCard({ product }: ProductCardProps) {
           className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
           referrerPolicy="no-referrer"
         />
-        {/* Zoom Overlay */}
-        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+        {/* Watermark Overlay */}
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-60 group-hover:opacity-10 transition-opacity duration-500 z-10">
+          <img src="/og-gracia-bakery.webp" alt="watermark" className="w-2/3 max-w-[150px] object-contain drop-shadow-md rounded-[30%]" />
+        </div>
+        
+        {/* Zoom Overlay (Hover Effect) */}
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none z-20">
           <div className="w-12 h-12 rounded-full bg-white/90 dark:bg-stone-800/90 flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl backdrop-blur-sm">
             <ZoomIn className="w-6 h-6 text-stone-700 dark:text-stone-300" />
           </div>
