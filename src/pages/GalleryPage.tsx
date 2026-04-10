@@ -58,7 +58,7 @@ export function GalleryPage() {
               
               {/* Watermark Overlay */}
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-60 group-hover:opacity-10 transition-opacity duration-500 z-10">
-                <img src="/og-gracia-bakery.webp" alt="watermark" className="w-1/2 max-w-[200px] object-contain drop-shadow-md" />
+                <img src="/og-gracia-bakery.webp" alt="watermark" className="w-1/2 max-w-[200px] object-contain drop-shadow-md rounded-[30%]" />
               </div>
               
               <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
