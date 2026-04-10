@@ -12,7 +12,7 @@ export function Hero() {
       <div className="absolute inset-0">
         <img
           className="w-full h-full object-cover opacity-40"
-          src="./hero-bg.webp"
+          src="./iva-ratag.webp"
           alt="Aneka roti dan kue kering"
           referrerPolicy="no-referrer"
         />
