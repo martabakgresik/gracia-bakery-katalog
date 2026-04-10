@@ -51,14 +51,19 @@ export function GalleryPage() {
               <img
                 src={product.image}
                 alt={product.name}
-                className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700"
+                className="w-full h-auto object-cover group-hover:scale-110 transition-transform duration-700 relative z-0"
                 referrerPolicy="no-referrer"
                 loading="lazy"
               />
               
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              {/* Watermark Overlay */}
+              <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40 group-hover:opacity-20 transition-opacity duration-300 z-10 mix-blend-overlay">
+                <img src="/og-gracia-bakery.webp" alt="watermark" className="w-1/2 object-contain grayscale invert opacity-50" />
+              </div>
               
-              <div className="absolute inset-0 flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10"></div>
+              
+              <div className="absolute inset-0 flex flex-col justify-end p-6 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-4 group-hover:translate-y-0 z-20">
                 <div className="bg-white/90 dark:bg-stone-800/90 w-10 h-10 rounded-full flex items-center justify-center mb-3 shadow-lg">
                   <ZoomIn className="w-5 h-5 text-stone-800 dark:text-stone-200" />
                 </div>
