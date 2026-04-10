@@ -1,4 +1,4 @@
-import { Plus, Star, StarHalf, Share2, Heart } from 'lucide-react';
+import { Plus, Star, StarHalf, Share2, Heart, ZoomIn } from 'lucide-react';
 import { Product } from '../types';
 import { shareProduct } from '../utils/share';
 import { formatPrice } from '../utils/format';
@@ -40,9 +40,15 @@ export function ProductCard({ product }: ProductCardProps) {
         <img
           src={product.image}
           alt={`${product.name} - ${product.category} Gracia Bakery`}
-          className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
+          className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-500"
           referrerPolicy="no-referrer"
         />
+        {/* Zoom Overlay */}
+        <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+          <div className="w-12 h-12 rounded-full bg-white/90 dark:bg-stone-800/90 flex items-center justify-center transform translate-y-4 group-hover:translate-y-0 transition-all duration-300 shadow-xl backdrop-blur-sm">
+            <ZoomIn className="w-6 h-6 text-stone-700 dark:text-stone-300" />
+          </div>
+        </div>
         <div className="absolute top-3 left-3">
           <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/90 dark:bg-stone-800/90 text-stone-800 dark:text-stone-200 backdrop-blur-sm shadow-sm">
             {product.category}
