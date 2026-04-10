@@ -39,7 +39,7 @@ export function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-[4/3] overflow-hidden bg-stone-100 dark:bg-stone-900">
         <img
           src={product.image}
-          alt={product.name}
+          alt={`${product.name} - ${product.category} Gracia Bakery`}
           className="object-cover w-full h-full group-hover:scale-105 transition-transform duration-500"
           referrerPolicy="no-referrer"
         />

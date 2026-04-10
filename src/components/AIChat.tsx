@@ -73,6 +73,7 @@ export function AIChat() {
     setIsLoading(true);
 
     try {
+feature/zustand-state-management
       const productContext = products.map(p => `- ${p.name} (${p.category}): Rp${p.price.toLocaleString('id-ID')}. ${p.description}`).join('\n');
 
       const systemInstruction = `Anda adalah "Gracia Asisten", representasi digital dan tenaga ahli/sales eksekutif resmi untuk website Gracia Bakery. Tujuan utama Anda adalah memandu pelanggan menjelajahi seluruh layanan dan katalog website kami, memahami kebutuhan mereka, serta melakukan "soft selling" cerdas untuk mendorong pemesanan produk tanpa terlihat memaksa.
@@ -105,8 +106,8 @@ export function AIChat() {
       
       Jadilah konsultan Bakery terbaik untuk pelanggan kami, buat mereka merasa dilayani dengan istimewa, dan kemukakan kelebihan website secara halus!`;
 
+
       const apiMessages = [
-        { role: 'system', content: systemInstruction },
         ...messages.map(m => ({ role: m.role, content: m.text })),
         { role: 'user', content: userText }
       ];
@@ -149,7 +150,7 @@ export function AIChat() {
   return (
     <>
       {/* Floating Button */}
-      <div className={`fixed bottom-6 right-6 z-40 ${isOpen ? 'hidden' : 'flex'} flex-col items-center gap-1.5`}>
+      <div className={`fixed bottom-6 left-6 z-40 ${isOpen ? 'hidden' : 'flex'} flex-col items-center gap-1.5`}>
         <button
           onClick={() => setIsOpen(true)}
           className="flex items-center justify-center w-14 h-14 bg-primary text-white rounded-full shadow-lg hover:bg-primary-light transition-all hover:scale-105 active:scale-95 group"
@@ -176,7 +177,7 @@ export function AIChat() {
               height: isMaximized ? 'min(800px, calc(100vh - 4rem))' : 'min(500px, calc(100vh - 4rem))',
             }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
-            className="fixed bottom-4 right-4 md:bottom-6 md:right-6 z-50 bg-white dark:bg-stone-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-300 ease-in-out"
+            className="fixed bottom-4 left-4 md:bottom-6 md:left-6 z-[130] bg-white dark:bg-stone-900 rounded-2xl shadow-2xl flex flex-col overflow-hidden border border-stone-200 dark:border-stone-800 transition-all duration-300 ease-in-out"
           >
             <ChatHeader 
               isLoading={isLoading}
