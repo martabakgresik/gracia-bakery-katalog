@@ -145,7 +145,6 @@ export function Header() {
               aria-label="Keranjang Belanja"
             >
               <motion.div
-                key={cartItemCount}
                 animate={showMiniCart ? { scale: [1, 1.3, 1] } : { scale: 1 }}
                 transition={{ duration: 0.3 }}
               >
@@ -153,10 +152,11 @@ export function Header() {
               </motion.div>
               {cartItemCount > 0 && (
                 <motion.span 
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
                   key={`badge-${cartItemCount}`}
-                  className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-orange-600 rounded-full"
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  className="absolute top-0 right-0 inline-flex items-center justify-center px-1.5 py-0.5 text-[10px] font-bold leading-none text-white transform translate-x-1/2 -translate-y-1/4 bg-primary rounded-full shadow-sm"
                 >
                   {cartItemCount}
                 </motion.span>

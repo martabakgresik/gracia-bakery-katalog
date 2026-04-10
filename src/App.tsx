@@ -74,28 +74,41 @@ export default function App() {
         {/* Floating UI Elements */}
         <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-3 pointer-events-none">
           {/* Floating Cart Button */}
-          <AnimatePresence>
-            {cartItemCount > 0 && (
-              <motion.button
-                initial={{ opacity: 0, y: 20, scale: 0.8 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: 20, scale: 0.8 }}
-                onClick={() => setIsCartOpen(true)}
-                className="pointer-events-auto flex items-center gap-3 bg-stone-900 dark:bg-stone-800 text-white px-4 py-3 rounded-2xl shadow-2xl hover:bg-stone-800 dark:hover:bg-stone-700 transition-all active:scale-95 group border border-stone-700/50"
-              >
-                <div className="relative">
+        <AnimatePresence>
+          {cartItemCount > 0 && (
+            <motion.button
+              initial={{ opacity: 0, y: 20, scale: 0.8 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: 20, scale: 0.8 }}
+              onClick={() => setIsCartOpen(true)}
+              className="pointer-events-auto flex items-center gap-3 bg-stone-900 dark:bg-stone-800 text-white px-4 py-3 rounded-2xl shadow-2xl hover:bg-stone-800 dark:hover:bg-stone-700 transition-all active:scale-95 group border border-stone-700/50"
+            >
+              <div className="relative">
+                <motion.div
+                  key={`bag-${cartItemCount}`} // to trigger the bounce when count increments
+                  initial={{ scale: 1 }}
+                  animate={{ scale: [1, 1.25, 1] }}
+                  transition={{ duration: 0.3 }}
+                >
                   <ShoppingBag className="w-6 h-6" />
-                  <span className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-stone-900 dark:border-stone-800">
-                    {cartItemCount}
-                  </span>
-                </div>
-                <div className="flex flex-col items-start leading-tight pr-1">
-                  <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Keranjang</span>
-                  <span className="text-sm font-bold">{formatPrice(cartTotal)}</span>
-                </div>
-              </motion.button>
-            )}
-          </AnimatePresence>
+                </motion.div>
+                <motion.span 
+                  key={`float-badge-${cartItemCount}`}
+                  initial={{ scale: 0.5, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  transition={{ type: 'spring', stiffness: 500, damping: 15 }}
+                  className="absolute -top-2 -right-2 bg-primary text-white text-[10px] font-bold w-5 h-5 rounded-full flex items-center justify-center border-2 border-stone-900 dark:border-stone-800 shadow-sm"
+                >
+                  {cartItemCount}
+                </motion.span>
+              </div>
+              <div className="flex flex-col items-start leading-tight pr-1">
+                <span className="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Keranjang</span>
+                <span className="text-sm font-bold">{formatPrice(cartTotal)}</span>
+              </div>
+            </motion.button>
+          )}
+        </AnimatePresence>
 
           {/* Back to Top Button */}
           <AnimatePresence>
