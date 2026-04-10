@@ -5,6 +5,7 @@ import { About } from '../components/About';
 import { FAQ } from '../components/FAQ';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
+import { Helmet } from 'react-helmet-async';
 
 const CATEGORIES = ['Semua', 'Roti', 'Jajanan Pasar', 'Kue Kering', 'Donat'];
 
@@ -31,6 +32,11 @@ export function HomePage() {
 
   return (
     <>
+      <Helmet>
+        <title>Menu Spesial | Gracia Bakery</title>
+        <meta name="description" content="Temukan beragam kue kering, bolu, roti, dan aneka jajanan pasar kualitas unggulan dari Gracia Bakery. Dipesan secara online sekarang!" />
+        <link rel="canonical" href="https://gracia.bakery.my.id/" />
+      </Helmet>
       <Hero />
       
       <section id="menu" className="py-20 bg-[#FDFBF7] dark:bg-stone-900 transition-colors duration-300">

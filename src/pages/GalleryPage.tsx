@@ -2,12 +2,18 @@ import { useStore } from '../store/useStore';
 import { motion } from 'motion/react';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ZoomIn } from 'lucide-react';
+import { Helmet } from 'react-helmet-async';
 
 export function GalleryPage() {
   const { productList, setSelectedProductId } = useStore();
 
   return (
     <div className="py-24 bg-stone-50 dark:bg-stone-900 min-h-screen text-stone-900 dark:text-stone-100 transition-colors duration-300">
+      <Helmet>
+        <title>Galeri Produk | Gracia Bakery</title>
+        <meta name="description" content="Lihat foto-foto lezat berbagai macam aneka roti, jajanan pasar masa kini, kue kering, pastry, dan pesanan snack box ala Gracia Bakery." />
+        <link rel="canonical" href="https://gracia.bakery.my.id/gallery" />
+      </Helmet>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         {/* Header Section */}
