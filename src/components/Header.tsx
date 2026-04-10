@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { ShoppingBag, Phone, Menu, Heart, History, X, CheckCircle2 } from 'lucide-react';
+import { ShoppingBag, Phone, Menu, Heart, History, X, CheckCircle2, Image as ImageIcon } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { ThemeToggle } from './ThemeToggle';
 import { useStore } from '../store/useStore';
 import { motion, AnimatePresence } from 'motion/react';
@@ -101,16 +102,17 @@ export function Header() {
 
           {/* Logo */}
           <div className="flex-shrink-0 flex items-center justify-center flex-1 sm:flex-none sm:justify-start">
-            <h1 className={`font-serif font-bold text-primary tracking-tight transition-all duration-300 ${isSlim ? 'text-2xl' : 'text-3xl'}`}>
+            <Link to="/" className={`font-serif font-bold text-primary tracking-tight transition-all duration-300 ${isSlim ? 'text-2xl' : 'text-3xl'}`}>
               Gracia Bakery
-            </h1>
+            </Link>
           </div>
 
           {/* Desktop Nav */}
           <nav className="hidden lg:flex ml-8 space-x-8 items-center">
-            <a href="#menu" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Menu</a>
-            <a href="#about" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Tentang Kami</a>
-            <a href="#faq" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">FAQ</a>
+            <Link to="/" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Beranda</Link>
+            <Link to="/gallery" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Galeri Foto</Link>
+            <a href="/#menu" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Menu</a>
+            <a href="/#about" className="text-stone-600 dark:text-stone-300 hover:text-primary dark:hover:text-primary-light font-medium transition-colors">Tentang Kami</a>
           </nav>
 
           {/* Desktop Contact & Cart */}
@@ -172,8 +174,22 @@ export function Header() {
               exit={{ height: 0, opacity: 0 }}
               className="sm:hidden overflow-hidden border-t border-stone-200 dark:border-stone-800 py-4 space-y-4"
             >
+              <Link 
+                to="/" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              >
+                Beranda
+              </Link>
+              <Link 
+                to="/gallery" 
+                onClick={() => setIsMobileMenuOpen(false)} 
+                className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
+              >
+                Galeri Foto
+              </Link>
               <a 
-                href="#menu" 
+                href="/#menu" 
                 onClick={() => setIsMobileMenuOpen(false)} 
                 className="block px-2 text-stone-600 dark:text-stone-300 font-medium hover:text-primary dark:hover:text-primary-light transition-colors"
               >
