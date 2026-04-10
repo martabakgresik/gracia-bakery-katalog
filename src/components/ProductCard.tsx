@@ -44,8 +44,8 @@ export function ProductCard({ product }: ProductCardProps) {
           referrerPolicy="no-referrer"
         />
         {/* Watermark Overlay */}
-        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-40 group-hover:opacity-20 transition-opacity duration-300 z-10 mix-blend-overlay">
-          <img src="/og-gracia-bakery.webp" alt="watermark" className="w-1/2 object-contain grayscale invert opacity-50" />
+        <div className="absolute inset-0 pointer-events-none flex items-center justify-center opacity-60 group-hover:opacity-10 transition-opacity duration-500 z-10">
+          <img src="/og-gracia-bakery.webp" alt="watermark" className="w-2/3 max-w-[150px] object-contain drop-shadow-md" />
         </div>
         
         {/* Zoom Overlay (Hover Effect) */}
