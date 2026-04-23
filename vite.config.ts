@@ -9,8 +9,7 @@ export default defineConfig(({mode}) => {
     base: process.env.NODE_ENV === 'production' ? './' : '/',
     plugins: [react(), tailwindcss()],
     define: {
-      'process.env.GEMINI_API_KEY': JSON.stringify(env.GEMINI_API_KEY || ''),
-      'process.env.POLLINATIONS_API_KEY': JSON.stringify(env.POLLINATIONS_API_KEY || env.VITE_POLLINATIONS_API_KEY || ''),
+      'process.env.NODE_ENV': JSON.stringify(mode),
     },
     resolve: {
       alias: {
