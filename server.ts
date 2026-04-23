@@ -19,21 +19,63 @@ async function startServer() {
   // Trust proxy is required for express-rate-limit to work correctly behind a load balancer/proxy
   app.set('trust proxy', 1);
 
-  // Use helmet for security headers, but disable some features that might interfere with Vite in dev
+  // Use helmet for security headers
   app.use(helmet({
-    contentSecurityPolicy: false, // Disabled to allow Vite's inline scripts and styles
-    crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "https://www.googletagmanager.com"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+        imgSrc: ["'self'", "data:", "https://gracia.bakery.my.id", "https://images.unsplash.com", "https://gen.pollinations.ai"],
+        connectSrc: ["'self'", "https://gen.pollinations.ai", "https://www.google-analytics.com"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com"],
+        objectSrc: ["'none'"],
+        upgradeInsecureRequests: [],
+      },
+    },
+    crossOriginEmbedderPolicy: false, // Keep disabled for Vite dev compatibility
   }));
 
   app.use(express.json());
 
+  const SYSTEM_INSTRUCTION = `Anda adalah "Gracia Asisten", asisten virtual resmi untuk website Gracia Bakery.
+    Toko ini berlokasi di Sidoarjo, Jawa Timur, Indonesia.
+    Toko ini menjual roti, jajanan pasar, kue kering, dan donat.
+    Nomor WhatsApp toko: +62 822-3330-9744.
+    
+    Tentang Gracia Bakery:
+    Berdiri sejak tahun 2010, Gracia Bakery bermula dari kecintaan terhadap resep kue tradisional warisan keluarga. Kami berkomitmen menggunakan bahan-bahan premium berkualitas tinggi tanpa bahan pengawet buatan. Semua dibuat fresh setiap hari.
+    
+    Daftar Produk Kami:
+    1. Kue Kering: Nastar Klasik (85rb), Coklat Cookies (65rb), Kastengel Keju (90rb).
+    2. Jajanan Pasar: Lemper Ayam (6rb), Sus Vanila (7rb), Pastel Roghut (6.5rb), Putu Ayu (4rb), Bakpao Unti Merah (6rb), Semar Mendem (7rb), Lumpur Kentang (5.5rb), Pie Buah Segar (8rb), Wajik Ketan (5rb).
+    3. Donat: Donat Gula Klasik (5rb), Donat Coklat Klasik (7rb), Donat Coklat Kacang (7.5rb), Bomboloni (8.5rb), Donat Mix Topping (45rb isi 6/12).
+    4. Roti: Roti Sobek Manis (25rb), Lapis Surabaya (125rb), Bolu Marmer (95rb).
+    
+    Informasi Penting (FAQ):
+    - Cara Pesan: Pilih produk, tambah ke keranjang, klik 'Pesan via WhatsApp'.
+    - Pembayaran: Transfer bank (BCA, Mandiri, BNI) & e-wallet (GoPay, OVO, Dana).
+    - Pengiriman: Roti/Jajanan (Dalam kota saja - Same Day/Instant). Kue Kering (Seluruh Indonesia).
+    - Waktu Proses: Pesan sebelum jam 14:00 dikirim hari yang sama (jika ready). Pesanan besar/custom minimal H-2.
+    - Halal: Semua produk 100% halal.
+    
+    Promo Aktif:
+    - Kode: GRACIADISKON (Diskon 10% untuk pemesanan pertama).
+    
+    Tugas Anda:
+    1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
+    2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya.
+    3. Jawab pertanyaan dengan singkat, padat, namun persuasif. Gunakan data produk di atas untuk menjawab.
+    4. Gunakan bahasa Indonesia yang santai namun tetap sopan.
+    5. Gunakan Markdown untuk format teks (tebal, miring).
+    6. Jika pelanggan ingin memesan, arahkan ke WhatsApp: [Hubungi WhatsApp](https://wa.me/6282233309744)`;
+
   const aiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100, // Limit each IP to 100 requests per windowMs
+    max: 100,
     standardHeaders: true,
     legacyHeaders: false,
-    validate: { trustProxy: false },
-    message: { error: 'Terlalu banyak permintaan AI. Silakan coba lagi nanti.' }
+    message: { error: 'Terlalu banyak permintaan. Silakan coba lagi nanti.' }
   });
 
   // API Proxy Route for Pollinations AI
@@ -42,50 +84,16 @@ async function startServer() {
     const apiKey = process.env.POLLINATIONS_API_KEY;
 
     if (!messages || !Array.isArray(messages)) {
-      return res.status(400).json({ error: "Invalid messages array provided" });
+      return res.status(400).json({ error: "Data tidak valid" });
     }
 
-    // Basic input validation
-    if (messages.length > 50) {
-      return res.status(400).json({ error: "Conversation too long" });
-    }
+    // Filter messages and inject system instruction securely
+    const filteredMessages = messages
+      .filter(m => m.role === 'user' || m.role === 'assistant')
+      .slice(-15); 
 
-    const systemInstruction = `Anda adalah "Gracia Asisten", asisten virtual resmi untuk website Gracia Bakery.
-      Toko ini berlokasi di Sidoarjo, Jawa Timur, Indonesia.
-      Toko ini menjual roti, jajanan pasar, kue kering, dan donat.
-      Nomor WhatsApp toko: +62 822-3330-9744.
-      
-      Tentang Gracia Bakery:
-      Berdiri sejak tahun 2010, Gracia Bakery bermula dari kecintaan terhadap resep kue tradisional warisan keluarga. Kami berkomitmen menggunakan bahan-bahan premium berkualitas tinggi tanpa bahan pengawet buatan. Semua dibuat fresh setiap hari.
-      
-      Daftar Produk Kami:
-      1. Kue Kering: Nastar Klasik (85rb), Coklat Cookies (65rb), Kastengel Keju (90rb).
-      2. Jajanan Pasar: Lemper Ayam (6rb), Sus Vanila (7rb), Pastel Roghut (6.5rb), Putu Ayu (4rb), Bakpao Unti Merah (6rb), Semar Mendem (7rb), Lumpur Kentang (5.5rb), Pie Buah Segar (8rb), Wajik Ketan (5rb).
-      3. Donat: Donat Gula Klasik (5rb), Donat Coklat Klasik (7rb), Donat Coklat Kacang (7.5rb), Bomboloni (8.5rb), Donat Mix Topping (45rb isi 6/12).
-      4. Roti: Roti Sobek Manis (25rb), Lapis Surabaya (125rb), Bolu Marmer (95rb).
-      
-      Informasi Penting (FAQ):
-      - Cara Pesan: Pilih produk, tambah ke keranjang, klik 'Pesan via WhatsApp'.
-      - Pembayaran: Transfer bank (BCA, Mandiri, BNI) & e-wallet (GoPay, OVO, Dana).
-      - Pengiriman: Roti/Jajanan (Dalam kota saja - Same Day/Instant). Kue Kering (Seluruh Indonesia).
-      - Waktu Proses: Pesan sebelum jam 14:00 dikirim hari yang sama (jika ready). Pesanan besar/custom minimal H-2.
-      - Halal: Semua produk 100% halal.
-      
-      Promo Aktif:
-      - Kode: GRACIADISKON (Diskon 10% untuk pemesanan pertama).
-      
-      Tugas Anda:
-      1. Selalu panggil pelanggan dengan sapaan "Kak" atau "Kakak".
-      2. Bersikaplah sangat ramah, hangat, antusias, dan berikan emoji secukupnya.
-      3. Jawab pertanyaan dengan singkat, padat, namun persuasif. Gunakan data produk di atas untuk menjawab.
-      4. Gunakan bahasa Indonesia yang santai namun tetap sopan.
-      5. Gunakan Markdown untuk format teks (tebal, miring).
-      6. Jika pelanggan ingin memesan, arahkan ke WhatsApp: [Hubungi WhatsApp](https://wa.me/6282233309744)`;
-
-    // Filter out any existing system messages from the client and prepend our own
-    const filteredMessages = messages.filter(m => m.role !== 'system');
     const apiMessages = [
-      { role: 'system', content: systemInstruction },
+      { role: 'system', content: SYSTEM_INSTRUCTION },
       ...filteredMessages
     ];
 
@@ -99,32 +107,24 @@ async function startServer() {
         body: JSON.stringify({
           messages: apiMessages,
           model: model || 'openai',
-          seed: seed || 42
+          seed: seed || 42,
+          temperature: 0.7
         })
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
-        console.error(`AI API Error (${response.status}):`, errorText);
+        console.error(`AI API Error (${response.status})`);
         return res.status(response.status).json({ 
-          error: "AI service returned an error",
-          status: response.status 
+          error: "Layanan AI sedang tidak tersedia."
         });
       }
 
       const data = await response.json();
-      
-      // Basic validation of the response structure
-      if (!data.choices?.[0]?.message?.content) {
-        throw new Error("Invalid response format from AI provider");
-      }
-
       res.json(data);
     } catch (error: any) {
       console.error('Error in AI Proxy:', error.message);
       res.status(500).json({ 
-        error: 'Failed to communicate with AI provider',
-        message: error.message 
+        error: 'Terjadi kesalahan pada server.'
       });
     }
   });
